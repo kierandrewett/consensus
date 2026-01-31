@@ -1,0 +1,51 @@
+{
+    "name": "consensus-voting-system",
+    "version": "1.0.0",
+    "main": "dist/bundle.js",
+    "license": "MPL-2.0",
+    "type": "module",
+    "scripts": {
+        "typecheck": "tsc --noEmit",
+        "build": "rm -rf dist && node build.js",
+        "dev": "NODE_ENV=development nodemon --watch src -e ts --exec 'yarn build && node dist/index.js'",
+        "start": "NODE_ENV=production node dist/bundle.js",
+        "db:seed": "tsc && yarn build && node dist/seed.js",
+        "db:reset": "yarn db:seed --reset",
+        "test": "yarn test:unit && yarn test:e2e",
+        "test:unit": "jest --testPathIgnorePatterns e2e",
+        "test:watch": "jest --watch --testPathIgnorePatterns e2e",
+        "test:coverage": "jest --coverage --testPathIgnorePatterns e2e",
+        "test:e2e": "jest --config jest.e2e.config.cjs"
+    },
+    "dependencies": {
+        "@fastify/cookie": "^11.0.2",
+        "@fastify/formbody": "^8.0.2",
+        "@fastify/session": "^11.1.1",
+        "@fastify/static": "^8.0.0",
+        "@fastify/view": "^11.1.1",
+        "bcrypt": "^5.1.1",
+        "better-sqlite3": "^12.6.2",
+        "ejs": "^4.0.1",
+        "env-paths": "^4.0.0",
+        "fastify": "^5.7.4",
+        "fs-extra": "^11.3.3",
+        "lucide": "^0.563.0",
+        "uuid": "^11.0.0",
+        "zxcvbn": "^4.4.2"
+    },
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.2",
+        "@types/better-sqlite3": "^7.6.13",
+        "@types/fs-extra": "^11.0.4",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^25.0.0",
+        "@types/puppeteer": "^7.0.4",
+        "@types/zxcvbn": "^4.4.5",
+        "esbuild": "^0.27.3",
+        "jest": "^30.0.0",
+        "nodemon": "^3.1.11",
+        "puppeteer": "^24.37.3",
+        "ts-jest": "^29.4.6",
+        "typescript": "^5.9.3"
+    }
+}
