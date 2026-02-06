@@ -186,4 +186,25 @@ export class AdminElectionController {
             return reply.status(400).send({ error: error.message });
         }
     }
+
+    /**
+     * Show election results
+     */
+    async showResults(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
+        if (!request.session.get('isAdmin')) {
+            return reply.redirect('/admin/login');
+        }
+
+        const election = this.electionService.getElection(request.params.id);
+        if (!election) {
+            return reply.status(404).send({ error: 'Election not found' });
+        }
+
+        const results = this.electionService.getResults(request.params.id);
+
+        return reply.view('admin/results.ejs', {
+            election,
+            results
+        });
+    }
 }
