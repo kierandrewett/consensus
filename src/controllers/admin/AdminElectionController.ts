@@ -85,6 +85,12 @@ export class AdminElectionController {
         const { name, electionType, startDate, endDate, description } = request.body;
 
         try {
+            // Validate election type
+            const validTypes = Object.values(ElectionType);
+            if (!validTypes.includes(electionType as ElectionType)) {
+                throw new Error(`Invalid election type. Must be one of: ${validTypes.join(', ')}`);
+            }
+
             const dto: ElectionCreationDTO = {
                 name,
                 electionType: electionType as ElectionType,
@@ -97,7 +103,11 @@ export class AdminElectionController {
 
             return reply.redirect(`/admin/elections/${election.electionID}`);
         } catch (error: any) {
-            return reply.status(400).send({ error: error.message });
+            return reply.status(400).view('admin/elections.ejs', {
+                title: 'Manage Elections',
+                elections: this.electionService.getAllElections(),
+                error: error.message
+            });
         }
     }
 
