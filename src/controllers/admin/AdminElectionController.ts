@@ -260,4 +260,25 @@ export class AdminElectionController {
         
         return reply.redirect(`/admin/elections/${electionId}/results`);
     }
+
+    /**
+     * Remove candidate from election
+     */
+    async removeCandidate(
+        request: FastifyRequest<{ Params: { id: string; candidateId: string } }>,
+        reply: FastifyReply
+    ): Promise<void> {
+        if (!request.session.get('isAdmin')) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+
+        const { id: electionId, candidateId } = request.params;
+
+        try {
+            this.electionService.removeCandidate(electionId, candidateId);
+            return reply.redirect(`/admin/elections/${electionId}`);
+        } catch (error: any) {
+            return reply.status(400).send({ error: error.message });
+        }
+    }
 }
