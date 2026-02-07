@@ -224,7 +224,39 @@ export class AdminElectionController {
         const { method, selectedCandidateId } = request.body;
         const electionId = request.params.id;
 
-        // TODO: implement tie resolution logic
+        try {
+            const election = this.electionService.getElection(electionId);
+            if (!election) {
+                return reply.status(404).send({ error: 'Election not found' });
+            }
+
+            const results = this.electionService.getResults(electionId);
+            if (!results.hasTie) {
+                return reply.redirect(`/admin/elections/${electionId}/results`);
+            }
+
+            let resolution;
+            switch (method) {
+                case 'RANDOM':
+                    resolution = this.electionService.resolveRandomly(electionId, results.tiedCandidates);
+                    break;
+                case 'MANUAL':
+                    if (!selectedCandidateId) {
+                        return reply.status(400).send({ error: 'Must select candidate for manual resolution' });
+                    }
+                    resolution = this.electionService.resolveManually(electionId, selectedCandidateId);
+                    break;
+                case 'RECALL':
+                    resolution = this.electionService.scheduleRecall(electionId);
+                    break;
+                default:
+                    return reply.status(400).send({ error: 'Invalid resolution method' });
+            }
+
+            this.tieResolutionRepo.save(resolution);
+        } catch (error: any) {
+            return reply.status(400).send({ error: error.message });
+        }
         
         return reply.redirect(`/admin/elections/${electionId}/results`);
     }
