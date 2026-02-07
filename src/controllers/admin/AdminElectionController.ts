@@ -209,4 +209,23 @@ export class AdminElectionController {
             results
         });
     }
+
+    /**
+     * Resolve tie for election
+     */
+    async resolveTie(
+        request: FastifyRequest<{ Params: { id: string }; Body: { method: string; selectedCandidateId?: string } }>,
+        reply: FastifyReply
+    ): Promise<void> {
+        if (!request.session.get('isAdmin')) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+
+        const { method, selectedCandidateId } = request.body;
+        const electionId = request.params.id;
+
+        // TODO: implement tie resolution logic
+        
+        return reply.redirect(`/admin/elections/${electionId}/results`);
+    }
 }
