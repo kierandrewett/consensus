@@ -1,7 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { ElectionService, ElectionCreationDTO } from '../../services/ElectionService';
 import { VotingService } from '../../services/VotingService';
-import { ElectionType } from '../../domain/enums';
+import { ElectionType, TieResolutionMethod } from '../../domain/enums';
+import { TieResolutionRepository } from '../../repositories/TieResolutionRepository';
 
 export interface ElectionCreationRequest {
     name: string;
@@ -20,7 +21,8 @@ export interface CandidateCreationRequest {
 export class AdminElectionController {
     constructor(
         private electionService: ElectionService,
-        private votingService: VotingService
+        private votingService: VotingService,
+        private tieResolutionRepo: TieResolutionRepository
     ) {}
 
     /**
