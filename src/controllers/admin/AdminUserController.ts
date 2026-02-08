@@ -52,4 +52,45 @@ export class AdminUserController {
             return reply.status(400).send({ error: error.message });
         }
     }
+
+    /**
+     * Delete admin
+     */
+    async deleteAdmin(
+        request: FastifyRequest<{ Params: { id: string } }>,
+        reply: FastifyReply
+    ): Promise<void> {
+        if (!request.session.get('isAdmin')) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+
+        const currentAdminId = request.session.get('adminId');
+        if (request.params.id === currentAdminId) {
+            return reply.status(400).send({ error: 'Cannot delete yourself' });
+        }
+
+        this.adminRepo.delete(request.params.id);
+        return reply.redirect('/admin/users');
+    }
+
+    /**
+     * Reset admin password
+     */
+    async resetPassword(
+        request: FastifyRequest<{ Params: { id: string } }>,
+        reply: FastifyReply
+    ): Promise<void> {
+        if (!request.session.get('isAdmin')) {
+            return reply.status(401).send({ error: 'Unauthorized' });
+        }
+
+        const tempPassword = generatePassword();
+        const hashedPassword = await hashPassword(tempPassword);
+
+        this.adminRepo.updatePassword(request.params.id, hashedPassword, true);
+
+        return reply.view('admin/password-reset.ejs', {
+            temporaryPassword: tempPassword
+        });
+    }
 }
