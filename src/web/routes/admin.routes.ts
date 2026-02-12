@@ -97,4 +97,43 @@ export async function adminRoutes(
     fastify.delete('/admin/elections/:id', async (request, reply) => {
         return election.deleteElection(request, reply);
     });
+
+    // ==================== VOTER ROUTES ====================
+    fastify.get('/admin/voters', async (request, reply) => {
+        return voter.showVoters(request, reply);
+    });
+
+    fastify.get('/admin/voters/:id', async (request, reply) => {
+        return voter.showVoter(request, reply);
+    });
+
+    fastify.post('/admin/voters/:id/approve', async (request, reply) => {
+        return voter.approveVoter(request, reply);
+    });
+
+    fastify.post('/admin/voters/:id/reject', async (request, reply) => {
+        return voter.rejectVoter(request, reply);
+    });
+
+    // ==================== ADMIN USER ROUTES ====================
+    fastify.get('/admin/admins', async (request, reply) => {
+        return user.showAdminUsers(request, reply);
+    });
+
+    fastify.post('/admin/admins', async (request, reply) => {
+        return user.createAdmin(request, reply);
+    });
+
+    fastify.post('/admin/admins/:id/delete', async (request, reply) => {
+        return user.deleteAdmin(request, reply);
+    });
+
+    // ==================== SETTINGS ROUTES ====================
+    fastify.get('/admin/management', async (request, reply) => {
+        return settings.showManagement(request, reply);
+    });
+
+    fastify.post('/admin/management', async (request, reply) => {
+        return settings.updateManagement(request, reply);
+    });
 }
