@@ -101,15 +101,45 @@ export async function createServer(): Promise<FastifyInstance> {
         candidateRepository
     );
 
+    // Start election scheduler (auto-start/close elections based on dates)
+    const scheduler = new ElectionScheduler(electionService, 60000); // Check every minute
+    scheduler.start();
+
     // Dependency Injection: Create controller instances
     const voterController = new VoterController(voterService, electionService, votingService, settingsRepository);
     const electionController = new ElectionController(electionService, votingService, tieResolutionRepository, voterService, settingsRepository);
     const votingController = new VotingController(votingService, voterService, electionService, settingsRepository);
+    
+    // Admin controllers (split for maintainability)
+    const adminControllers: AdminControllers = {
+        auth: new AdminAuthController(adminRepository),
+        dashboard: new AdminDashboardController(electionService, voterService, votingService),
+        election: new AdminElectionController(electionService, votingService, tieResolutionRepository),
+        voter: new AdminVoterController(voterService),
+        user: new AdminUserController(adminRepository),
+        settings: new AdminSettingsController(settingsRepository)
+    };
 
     // Register routes
     await voterRoutes(fastify, voterController);
     await electionRoutes(fastify, electionController);
     await votingRoutes(fastify, votingController);
+    await adminRoutes(fastify, adminControllers);
+
+    // Home route
+    fastify.get('/', async (request, reply) => {
+        if (request.session.isAdmin) {
+            return reply.redirect('/admin/dashboard');
+        }
+        if (request.session.voterID) {
+            return reply.redirect('/dashboard');
+        }
+        const query = request.query as any;
+        return reply.view('home.ejs', {
+            title: 'Consensus - Electronic Voting System',
+            deleted: query.deleted === '1'
+        });
+    });
 
     return fastify;
 }
