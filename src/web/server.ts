@@ -79,6 +79,52 @@ export async function createServer(): Promise<FastifyInstance> {
 
     // Create settings repository early for use in hooks
     const settingsRepository = new SettingsRepository();
+    
+    // Override reply.view to automatically merge locals
+    fastify.addHook('onRequest', async (_request, reply) => {
+        reply.locals = {
+            voterID: null,
+            voterName: null,
+            isAdmin: false,
+            adminUsername: null
+        };
+        const originalView = reply.view.bind(reply);
+        reply.view = function(template: string, data?: object) {
+            const mergedData = { ...reply.locals, ...data };
+            return originalView(template, mergedData);
+        } as typeof reply.view;
+    });
+
+    // Add hook to pass session data and settings to all views
+    fastify.addHook('preHandler', async (request, reply) => {
+        const settings = settingsRepository.getAll();
+        
+        // Check maintenance mode - block non-admin users from most routes
+        if (settings.maintenanceMode && !request.session.isAdmin) {
+            const url = request.url;
+            if (!url.startsWith('/admin') && !url.startsWith('/public')) {
+                return reply.status(503).view('maintenance.ejs', {
+                    title: 'Under Maintenance',
+                    message: settings.maintenanceMessage || 'We are currently performing maintenance. Please check back later.'
+                });
+            }
+        }
+        
+        // Make session data and settings available to all templates
+        reply.locals = {
+            voterID: request.session.voterID || null,
+            voterName: request.session.voterName || null,
+            isAdmin: request.session.isAdmin || false,
+            adminUsername: request.session.adminUsername || null,
+            siteBanner: settings.bannerEnabled ? {
+                message: settings.bannerMessage,
+                type: settings.bannerType
+            } : null,
+            signupEnabled: settings.signupEnabled,
+            loginEnabled: settings.loginEnabled,
+            testMode: process.env.NODE_ENV === 'test'
+        };
+    });
 
     // Dependency Injection: Create repository instances
     const voterRepository = new VoterRepository();
