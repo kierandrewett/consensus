@@ -187,5 +187,48 @@ export async function createServer(): Promise<FastifyInstance> {
         });
     });
 
+    // Custom 404 handler
+    fastify.setNotFoundHandler(async (_request, reply) => {
+        return reply.status(404).view('404.ejs', {
+            title: 'Page Not Found'
+        });
+    });
+
+    // Custom error handler
+    fastify.setErrorHandler(async (error, _request, reply) => {
+        const err = error as Error & { statusCode?: number };
+        const statusCode = err.statusCode || 500;
+        
+        fastify.log.error(error);
+        
+        const message = statusCode === 500 
+            ? 'An unexpected error occurred. Please try again later.'
+            : err.message;
+        
+        return reply.status(statusCode).view('error.ejs', {
+            title: statusCode === 500 ? 'Server Error' : 'Error',
+            error: message
+        });
+    });
+
     return fastify;
+}
+
+export async function startServer(): Promise<void> {
+    try {
+        const db = DatabaseConnection.getInstance();
+        DatabaseConnection.runMigrations();
+        
+        const server = await createServer();
+        
+        await server.listen({
+            host: config.server.host,
+            port: config.server.port
+        });
+
+        console.log(`Consensus E-Voting System running on http://${config.server.host}:${config.server.port}`);
+    } catch (err) {
+        console.error('Error starting server:', err);
+        process.exit(1);
+    }
 }
