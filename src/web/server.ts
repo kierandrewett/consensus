@@ -136,6 +136,23 @@ export async function createServer(): Promise<FastifyInstance> {
     const adminRepository = new AdminRepository();
     const tieResolutionRepository = new TieResolutionRepository();
 
+    // Ensure at least one admin exists
+    const admins = adminRepository.findAll();
+    if (admins.length === 0) {
+        const defaultPassword = process.env.CONSENSUS_ADMIN_DEFAULT_PASSWORD || 'admin123';
+        const passwordHash = await PasswordUtil.hash(defaultPassword);
+        const admin = new Admin(
+            uuidv4(),
+            'admin',
+            passwordHash,
+            'Administrator',
+            new Date(),
+            true // mustChangePassword
+        );
+        adminRepository.save(admin);
+        console.log('Created default admin user (username: admin)');
+    }
+
     // Dependency Injection: Create service instances
     const voterService = new VoterService(voterRepository);
     const electionService = new ElectionService(electionRepository, candidateRepository);
