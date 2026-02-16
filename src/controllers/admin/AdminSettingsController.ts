@@ -1,84 +1,84 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { SettingsRepository } from '../../repositories/SettingsRepository';
 
-export interface BannerSettingsRequest {
-    bannerText: string;
-    bannerEnabled: string;
-}
-
-export interface MaintenanceRequest {
-    maintenanceMode: string;
-}
-
-export interface GuestVotingRequest {
-    guestVotingEnabled: string;
-}
-
 export class AdminSettingsController {
-    constructor(private settingsRepo: SettingsRepository) {}
+    constructor(private settingsRepository: SettingsRepository) {}
 
     /**
-     * Show settings page
+     * Helper to redirect to login with return URL
      */
-    async showSettings(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.redirect('/admin/login');
-        }
-
-        const settings = this.settingsRepo.getAll();
-        return reply.view('admin/settings.ejs', { settings });
+    private redirectToLogin(request: FastifyRequest, reply: FastifyReply): void {
+        const returnUrl = encodeURIComponent(request.url);
+        reply.redirect(`/admin/login?to=${returnUrl}`);
     }
 
     /**
-     * Update banner settings
+     * Show management settings page
      */
-    async updateBanner(
-        request: FastifyRequest<{ Body: BannerSettingsRequest }>,
-        reply: FastifyReply
-    ): Promise<void> {
+    async showManagement(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+            return this.redirectToLogin(request, reply);
         }
 
-        const { bannerText, bannerEnabled } = request.body;
-        
-        this.settingsRepo.set('banner_text', bannerText);
-        this.settingsRepo.set('banner_enabled', bannerEnabled === 'on' ? 'true' : 'false');
+        const settings = this.settingsRepository.getAll();
+        const successMessage = request.session.get('managementSuccess');
+        request.session.set('managementSuccess', undefined);
 
-        return reply.redirect('/admin/settings');
+        return reply.view('admin/management.ejs', {
+            title: 'System Management',
+            settings,
+            success: successMessage
+        });
     }
 
     /**
-     * Update maintenance mode
+     * Update management settings
      */
-    async updateMaintenanceMode(
-        request: FastifyRequest<{ Body: MaintenanceRequest }>,
+    async updateManagement(
+        request: FastifyRequest<{
+            Body: {
+                bannerEnabled?: string;
+                bannerMessage?: string;
+                bannerType?: string;
+                signupEnabled?: string;
+                loginEnabled?: string;
+                maintenanceMode?: string;
+                maintenanceMessage?: string;
+                guestVotingEnabled?: string;
+                autoApprovalEnabled?: string;
+                turnstileEnabled?: string;
+                turnstileSiteKey?: string;
+                turnstileSecretKey?: string;
+            };
+        }>,
         reply: FastifyReply
     ): Promise<void> {
         if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+            return this.redirectToLogin(request, reply);
         }
 
-        const { maintenanceMode } = request.body;
-        this.settingsRepo.set('maintenance_mode', maintenanceMode === 'on' ? 'true' : 'false');
+        const body = request.body;
 
-        return reply.redirect('/admin/settings');
-    }
+        // If guest voting is enabled, auto-approval must be enabled
+        const guestVotingEnabled = body.guestVotingEnabled === 'on';
+        const autoApprovalEnabled = guestVotingEnabled || body.autoApprovalEnabled === 'on';
 
-    /**
-     * Update guest voting settings
-     */
-    async updateGuestVoting(
-        request: FastifyRequest<{ Body: GuestVotingRequest }>,
-        reply: FastifyReply
-    ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
-        }
+        this.settingsRepository.updateAll({
+            bannerEnabled: body.bannerEnabled === 'on',
+            bannerMessage: body.bannerMessage || '',
+            bannerType: (body.bannerType as 'info' | 'warning' | 'error') || 'info',
+            signupEnabled: body.signupEnabled === 'on',
+            loginEnabled: body.loginEnabled === 'on',
+            maintenanceMode: body.maintenanceMode === 'on',
+            maintenanceMessage: body.maintenanceMessage || '',
+            guestVotingEnabled,
+            autoApprovalEnabled,
+            turnstileEnabled: body.turnstileEnabled === 'on',
+            turnstileSiteKey: body.turnstileSiteKey || '',
+            turnstileSecretKey: body.turnstileSecretKey || ''
+        });
 
-        const { guestVotingEnabled } = request.body;
-        this.settingsRepo.set('guest_voting_enabled', guestVotingEnabled === 'on' ? 'true' : 'false');
-
-        return reply.redirect('/admin/settings');
+        request.session.set('managementSuccess', 'Settings updated successfully');
+        return reply.redirect('/admin/management');
     }
 }
