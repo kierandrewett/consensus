@@ -5,7 +5,11 @@ import {
     AdminElectionController,
     AdminVoterController,
     AdminUserController,
-    AdminSettingsController
+    AdminSettingsController,
+    AdminLoginRequest,
+    ElectionCreationRequest,
+    CandidateCreationRequest,
+    AdminCreationRequest
 } from '../../controllers/admin';
 
 export interface AdminControllers {
@@ -28,11 +32,11 @@ export async function adminRoutes(
         return reply.redirect('/admin/login');
     });
 
-    fastify.get('/admin/login', async (request, reply) => {
+    fastify.get<{ Querystring: { to?: string } }>('/admin/login', async (request, reply) => {
         return auth.showLogin(request, reply);
     });
 
-    fastify.post('/admin/login', async (request, reply) => {
+    fastify.post<{ Body: AdminLoginRequest }>('/admin/login', async (request, reply) => {
         return auth.login(request, reply);
     });
 
@@ -40,7 +44,7 @@ export async function adminRoutes(
         return auth.showChangePassword(request, reply);
     });
 
-    fastify.post('/admin/change-password', async (request, reply) => {
+    fastify.post<{ Body: { password: string; confirmPassword: string } }>('/admin/change-password', async (request, reply) => {
         return auth.changePassword(request, reply);
     });
 
@@ -58,7 +62,7 @@ export async function adminRoutes(
         return election.showElections(request, reply);
     });
 
-    fastify.post('/admin/elections', async (request, reply) => {
+    fastify.post<{ Body: ElectionCreationRequest }>('/admin/elections', async (request, reply) => {
         return election.createElection(request, reply);
     });
 
@@ -66,35 +70,42 @@ export async function adminRoutes(
         return election.showResults(request, reply);
     });
 
-    fastify.get('/admin/elections/:id', async (request, reply) => {
+    fastify.get<{ Params: { id: string } }>('/admin/elections/:id', async (request, reply) => {
         return election.showElection(request, reply);
     });
 
-    fastify.post('/admin/elections/:id/close', async (request, reply) => {
+    fastify.post<{ Params: { id: string } }>('/admin/elections/:id/close', async (request, reply) => {
         return election.closeElection(request, reply);
     });
 
-    fastify.post('/admin/elections/:id/activate', async (request, reply) => {
+    fastify.post<{ Params: { id: string } }>('/admin/elections/:id/activate', async (request, reply) => {
         return election.activateElection(request, reply);
     });
 
-    fastify.post('/admin/elections/:id/candidates', async (request, reply) => {
+    fastify.post<{ Params: { id: string }; Body: CandidateCreationRequest }>('/admin/elections/:id/candidates', async (request, reply) => {
         return election.addCandidate(request, reply);
     });
 
-    fastify.post('/admin/elections/:electionId/candidates/:candidateId/remove', async (request, reply) => {
+    fastify.post<{ Params: { electionId: string; candidateId: string } }>('/admin/elections/:electionId/candidates/:candidateId/remove', async (request, reply) => {
         return election.removeCandidate(request, reply);
     });
 
-    fastify.post('/admin/elections/:id/resolve-tie', async (request, reply) => {
+    fastify.post<{
+        Params: { id: string };
+        Body: {
+            resolutionType: 'RANDOM' | 'MANUAL' | 'RECALL';
+            selectedCandidate?: string;
+            notes?: string;
+        };
+    }>('/admin/elections/:id/resolve-tie', async (request, reply) => {
         return election.resolveTie(request, reply);
     });
 
-    fastify.post('/admin/elections/:id/delete', async (request, reply) => {
+    fastify.post<{ Params: { id: string } }>('/admin/elections/:id/delete', async (request, reply) => {
         return election.deleteElection(request, reply);
     });
 
-    fastify.delete('/admin/elections/:id', async (request, reply) => {
+    fastify.delete<{ Params: { id: string } }>('/admin/elections/:id', async (request, reply) => {
         return election.deleteElection(request, reply);
     });
 
@@ -103,15 +114,15 @@ export async function adminRoutes(
         return voter.showVoters(request, reply);
     });
 
-    fastify.get('/admin/voters/:id', async (request, reply) => {
+    fastify.get<{ Params: { id: string } }>('/admin/voters/:id', async (request, reply) => {
         return voter.showVoter(request, reply);
     });
 
-    fastify.post('/admin/voters/:id/approve', async (request, reply) => {
+    fastify.post<{ Params: { id: string } }>('/admin/voters/:id/approve', async (request, reply) => {
         return voter.approveVoter(request, reply);
     });
 
-    fastify.post('/admin/voters/:id/reject', async (request, reply) => {
+    fastify.post<{ Params: { id: string } }>('/admin/voters/:id/reject', async (request, reply) => {
         return voter.rejectVoter(request, reply);
     });
 
@@ -120,11 +131,11 @@ export async function adminRoutes(
         return user.showAdminUsers(request, reply);
     });
 
-    fastify.post('/admin/admins', async (request, reply) => {
+    fastify.post<{ Body: AdminCreationRequest }>('/admin/admins', async (request, reply) => {
         return user.createAdmin(request, reply);
     });
 
-    fastify.post('/admin/admins/:id/delete', async (request, reply) => {
+    fastify.post<{ Params: { id: string } }>('/admin/admins/:id/delete', async (request, reply) => {
         return user.deleteAdmin(request, reply);
     });
 
@@ -133,7 +144,22 @@ export async function adminRoutes(
         return settings.showManagement(request, reply);
     });
 
-    fastify.post('/admin/management', async (request, reply) => {
+    fastify.post<{
+        Body: {
+            bannerEnabled?: string;
+            bannerMessage?: string;
+            bannerType?: string;
+            signupEnabled?: string;
+            loginEnabled?: string;
+            maintenanceMode?: string;
+            maintenanceMessage?: string;
+            guestVotingEnabled?: string;
+            autoApprovalEnabled?: string;
+            turnstileEnabled?: string;
+            turnstileSiteKey?: string;
+            turnstileSecretKey?: string;
+        };
+    }>('/admin/management', async (request, reply) => {
         return settings.updateManagement(request, reply);
     });
 }
