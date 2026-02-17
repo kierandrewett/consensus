@@ -53,7 +53,7 @@ export async function createServer(): Promise<FastifyInstance> {
         logger: true
     });
 
-    // Register form body parser
+    // Register form body parser (for HTML form submissions)
     await fastify.register(fastifyFormbody);
 
     // Register cookie plugin (required by session)
@@ -64,7 +64,7 @@ export async function createServer(): Promise<FastifyInstance> {
         secret: config.session.secret,
         cookieName: config.session.cookieName,
         cookie: {
-            secure: false
+            secure: false // Set to true in production with HTTPS
         }
     });
 
@@ -102,6 +102,7 @@ export async function createServer(): Promise<FastifyInstance> {
         // Check maintenance mode - block non-admin users from most routes
         if (settings.maintenanceMode && !request.session.isAdmin) {
             const url = request.url;
+            // Allow admin routes and static files
             if (!url.startsWith('/admin') && !url.startsWith('/public')) {
                 return reply.status(503).view('maintenance.ejs', {
                     title: 'Under Maintenance',
@@ -135,6 +136,7 @@ export async function createServer(): Promise<FastifyInstance> {
     const confirmationRepository = new VoteConfirmationRepository();
     const adminRepository = new AdminRepository();
     const tieResolutionRepository = new TieResolutionRepository();
+    // settingsRepository created above
 
     // Ensure at least one admin exists
     const admins = adminRepository.findAll();
@@ -191,12 +193,16 @@ export async function createServer(): Promise<FastifyInstance> {
 
     // Home route
     fastify.get('/', async (request, reply) => {
+        // Redirect logged-in admins to admin dashboard
         if (request.session.isAdmin) {
             return reply.redirect('/admin/dashboard');
         }
+        
+        // Redirect logged-in voters to voter dashboard
         if (request.session.voterID) {
             return reply.redirect('/dashboard');
         }
+        
         const query = request.query as any;
         return reply.view('home.ejs', {
             title: 'Consensus - Electronic Voting System',
@@ -216,8 +222,10 @@ export async function createServer(): Promise<FastifyInstance> {
         const err = error as Error & { statusCode?: number };
         const statusCode = err.statusCode || 500;
         
+        // Log the error
         fastify.log.error(error);
         
+        // Don't expose internal errors in production
         const message = statusCode === 500 
             ? 'An unexpected error occurred. Please try again later.'
             : err.message;
@@ -234,6 +242,8 @@ export async function createServer(): Promise<FastifyInstance> {
 export async function startServer(): Promise<void> {
     try {
         const db = DatabaseConnection.getInstance();
+
+        // Run database migrations
         DatabaseConnection.runMigrations();
         
         const server = await createServer();
@@ -244,6 +254,49 @@ export async function startServer(): Promise<void> {
         });
 
         console.log(`Consensus E-Voting System running on http://${config.server.host}:${config.server.port}`);
+        
+        // Log system data using repositories
+        console.log('\n=== System Data ===');
+        
+        const voterRepo = new VoterRepository(db);
+        const electionRepo = new ElectionRepository(db);
+        const candidateRepo = new CandidateRepository(db);
+        const adminRepo = new AdminRepository(db);
+        
+        // Log admins
+        const admins = adminRepo.findAll();
+        console.log(`\nAdmins (${admins.length}):`);
+        admins.forEach(a => {
+            console.log(`  - ${a.username} (${a.name})`);
+        });
+        
+        // Log voters
+        const voters = voterRepo.findAll();
+        console.log(`\nVoters (${voters.length}):`);
+        voters.forEach(v => {
+            console.log(`  - ${v.name} (${v.email}) [${v.registrationStatus}]`);
+        });
+        
+        // Log elections
+        const elections = electionRepo.findAll();
+        console.log(`\nElections (${elections.length}):`);
+        elections.forEach(e => {
+            console.log(`  - ${e.name} [${e.electionType}] - Status: ${e.status}`);
+        });
+        
+        // Log candidates
+        const allCandidates = elections.flatMap(e => candidateRepo.findByElectionId(e.electionID));
+        console.log(`\nCandidates (${allCandidates.length}):`);
+        allCandidates.forEach(c => {
+            const election = elections.find(e => e.electionID === c.electionID);
+            console.log(`  - ${c.name} (${c.party}) - ${election?.name}`);
+        });
+
+        if (voters.length === 0 && elections.length === 0 && allCandidates.length === 0 && admins.length === 0) {
+            console.log('\n(!!!) No data found. Run `yarn db:seed` to populate the database with sample data.');
+        }
+        
+        console.log('\n==================\n');
     } catch (err) {
         console.error('Error starting server:', err);
         process.exit(1);
