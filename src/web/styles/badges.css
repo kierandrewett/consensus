@@ -1,0 +1,101 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-success { background: var(--success); color: white; }
+.badge-warning { background: var(--warning); color: #1f2937; }
+.badge-error   { background: var(--danger);  color: white; }
+
+
+/* Status pills */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.status-badge.status-active,
+.status-badge.status-approved { background: #d1fae5; color: #065f46; }
+
+.status-badge.status-closed,
+.status-badge.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.status-badge.status-pending { background: #fef3c7; color: #92400e; }
+.status-badge.status-draft   { background: #e0e7ff; color: #3730a3; }
+.status-badge.status-scheduled { background: #dbeafe; color: #1e40af; }
+.status-badge.status-suspended { background: #fce7f3; color: #9d174d; }
+
+/* Legacy text-only status colours */
+.status-pending  { color: #d97706; }
+.status-approved { color: var(--success); }
+.status-rejected { color: var(--danger); }
+.status-draft    { color: #3730a3; }
+
+
+/* Winner/Tied */
+
+.winner-badge,
+.tied-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+}
+
+.winner-badge { background: var(--success); }
+.tied-badge   { background: var(--warning); }
+
+
+/* Election state badges */
+
+.election-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.election-badge.election-active    { background: #d1fae5; color: #065f46; }
+.election-badge.election-voted     { background: #d1fae5; color: #065f46; }
+.election-badge.election-closed    { background: #fee2e2; color: #991b1b; }
+.election-badge.election-draft     { background: #e0e7ff; color: #3730a3; }
+.election-badge.election-scheduled { background: #dbeafe; color: #1e40af; }
+
+
+/* Confirmation pill */
+
+.confirmation-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--success);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white;
+}

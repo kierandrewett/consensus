@@ -1,0 +1,62 @@
+:root {
+    /* Brand */
+    --brand: #2563eb;
+    --brand-dark: #1d4ed8;
+    --brand-darker: #1e40af;
+
+    /* Semantic */
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+
+    /* Neutrals */
+    --text: #1e293b;
+    --muted: #64748b;
+    --bg: #f8fafc;
+    --border: #e2e8f0;
+
+    /* Shadows - reused enough to warrant a variable */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
+    --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+}
+
+main {
+    flex: 1;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+abbr {
+    cursor: help;
+    text-decoration: underline dotted;
+    border-bottom: none; /* removes default in some browsers */
+}
+
+abbr:hover {
+    text-decoration: underline solid;
+}
+

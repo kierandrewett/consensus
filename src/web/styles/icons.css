@@ -1,0 +1,10 @@
+.icon-sm { width: 16px; height: 16px; }
+.icon-md { width: 20px; height: 20px; }
+.icon-lg { width: 28px; height: 28px; }
+.icon-xl { width: 48px; height: 48px; }
+
+.icon-success { color: var(--success); }
+.icon-error   { color: var(--danger); }
+.icon-warning { color: var(--warning); }
+.icon-info    { color: var(--info); }
+.icon-muted   { color: var(--muted); }

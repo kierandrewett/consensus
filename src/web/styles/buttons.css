@@ -1,0 +1,121 @@
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 500;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn:disabled,
+.btn[disabled] {
+    background: #9ca3af;
+    color: white;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn i, .btn svg {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+}
+
+.btn-sm i, .btn-sm svg {
+    width: 12px;
+    height: 12px;
+}
+
+.btn-primary {
+    background: var(--brand);
+    color: white;
+}
+.btn-primary:hover { background: var(--brand-dark); }
+
+.btn-secondary {
+    background: var(--muted);
+    color: white;
+}
+.btn-secondary:hover { background: #475569; }
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+.btn-danger:hover { background: #dc2626; }
+
+.btn-warning {
+    background: var(--warning);
+    color: #1f2937;
+}
+.btn-warning:hover {
+    background: #d97706;
+    color: white;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.btn-admin {
+    display: block;
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--brand);
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-admin:hover { background: var(--brand-dark); }
+
+.btn-icon {
+    padding: 0.25rem;
+    border: none;
+    background: none;
+    font-size: 1.125rem;
+    opacity: 0.6;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn-icon:hover { opacity: 1; }
+
+.btn-danger-icon {
+    padding: 0.25rem;
+    border: none;
+    background: none;
+    color: var(--danger);
+    opacity: 0.7;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn-danger-icon:hover { opacity: 1; }
+
+.btn-success {
+    background: #16a34a;
+    color: white;
+}
+.btn-success:hover { background: #15803d; }
+.btn-success:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
