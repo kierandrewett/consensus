@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+
+<div class="admin-login">
+    <div class="admin-login-container">
+        <div class="admin-warning-banner">
+            <i data-lucide="alert-triangle" style="width: 20px; height: 20px; min-width: 20px; min-height: 20px;"></i>
+            <p>Access is restricted to authorised administrators of the voting system only. Any unauthorised access, interference, or attempt to influence system operation may be monitored and acted upon under applicable law.</p>
+        </div>
+        
+        <div class="admin-header">
+            <h1>Authenticate yourself</h1>
+            <p>Access system management and election administration</p>
+        </div>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-error">
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <form method="POST" action="/admin/login" class="admin-form">
+            <% if (typeof redirectTo !== 'undefined' && redirectTo) { %>
+                <input type="hidden" name="to" value="<%= redirectTo %>">
+            <% } %>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autofocus>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-admin">Login to Admin Panel</button>
+        </form>
+        
+        <div class="admin-footer">
+            <a href="/">← Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

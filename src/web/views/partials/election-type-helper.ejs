@@ -1,0 +1,22 @@
+<%
+// Election type abbreviation helper - Define in global scope
+if (typeof global.formatElectionType === 'undefined') {
+    global.formatElectionType = function(type) {
+        const electionTypeLabels = {
+            'FPTP': { full: 'First Past The Post', description: 'Winner takes all - candidate with most votes wins' },
+            'STV': { full: 'Single Transferable Vote', description: 'Proportional representation using ranked preferences' },
+            'AV': { full: 'Alternative Vote', description: 'Ranked choice with instant runoff' },
+            'PREFERENTIAL': { full: 'Preferential Voting', description: 'Voters rank candidates in order of preference' }
+        };
+        
+        const label = electionTypeLabels[type];
+        if (label) {
+            return `<abbr title="${label.full} - ${label.description}">${type}</abbr>`;
+        }
+        return type;
+    };
+}
+
+// Alias for convenience in templates
+formatElectionType = global.formatElectionType;
+%>

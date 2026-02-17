@@ -1,0 +1,118 @@
+<%- include('../partials/dashboard-header', { activeTab: 'overview' }) %>
+
+<% if (voter.registrationStatus === 'PENDING') { %>
+    <div class="status-notice">
+        <i data-lucide="clock" style="width: 20px; height: 20px;"></i>
+        <div class="status-notice-content">
+            <h3>Registration Pending</h3>
+            <p>Your account is awaiting admin approval. You'll be able to vote once approved.</p>
+        </div>
+    </div>
+<% } else if (voter.registrationStatus === 'REJECTED') { %>
+    <div class="status-notice rejected">
+        <i data-lucide="x-circle" style="width: 20px; height: 20px;"></i>
+        <div class="status-notice-content">
+            <h3>Registration Not Approved</h3>
+            <p>Your voter registration was not approved. Contact an administrator for more information.</p>
+        </div>
+    </div>
+<% } else { %>
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon pending-vote">
+                <i data-lucide="vote"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value"><%= availableElections.length %></span>
+                <span class="stat-label">Pending Votes</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon completed">
+                <i data-lucide="check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value"><%= votedCount %></span>
+                <span class="stat-label">Votes Cast</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon status">
+                <i data-lucide="shield-check"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-value status-approved">Verified</span>
+                <span class="stat-label">Voter Status</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Quick Actions -->
+        <section class="dashboard-panel">
+            <h2>Quick Actions</h2>
+            <% if (availableElections.length > 0) { %>
+                <div class="action-list">
+                    <% availableElections.slice(0, 3).forEach(election => { %>
+                        <a href="/vote/<%= election.electionID %>" class="action-item action-vote">
+                            <div class="action-icon">
+                                <i data-lucide="vote"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>Vote in <%= election.name %></strong>
+                                <span>Closes <%= election.endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) %></span>
+                            </div>
+                            <i data-lucide="chevron-right" class="action-arrow"></i>
+                        </a>
+                    <% }) %>
+                    <% if (availableElections.length > 3) { %>
+                        <a href="/elections" class="action-item">
+                            <div class="action-icon">
+                                <i data-lucide="list"></i>
+                            </div>
+                            <div class="action-content">
+                                <strong>View All Elections</strong>
+                                <span><%= availableElections.length - 3 %> more awaiting your vote</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="action-arrow"></i>
+                        </a>
+                    <% } %>
+                </div>
+            <% } else { %>
+                <div class="panel-empty">
+                    <i data-lucide="check-circle"></i>
+                    <p>You're all caught up! No pending votes.</p>
+                    <a href="/elections" class="btn btn-secondary btn-sm">Browse Elections</a>
+                </div>
+            <% } %>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="dashboard-panel">
+            <h2>Recent Activity</h2>
+            <% if (recentVotes.length > 0) { %>
+                <div class="activity-list">
+                    <% recentVotes.forEach(vote => { %>
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i data-lucide="check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <strong>Voted in <%= vote.electionName %></strong>
+                                <span><%= vote.timestamp.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %></span>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="panel-empty">
+                    <i data-lucide="history"></i>
+                    <p>No voting activity yet.</p>
+                </div>
+            <% } %>
+        </section>
+    </div>
+<% } %>
+
+<%- include('../partials/dashboard-footer') %>

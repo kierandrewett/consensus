@@ -1,0 +1,93 @@
+<%- include('../partials/header') %>
+
+<div class="admin-dashboard">
+    <%- include('../partials/admin-sidebar', { activePage: 'voters' }) %>
+    
+    <div class="admin-content">
+        <div class="admin-header">
+            <div class="admin-header-info">
+                <h1>Manage Voters</h1>
+                <p>View and manage registered voters</p>
+            </div>
+        </div>
+        
+        <% 
+            const pendingVoters = voters.filter(v => v.registrationStatus === 'PENDING');
+            const approvedVoters = voters.filter(v => v.registrationStatus === 'APPROVED');
+            const rejectedVoters = voters.filter(v => v.registrationStatus === 'REJECTED');
+        %>
+        
+        <div class="admin-section">
+            <% if (voters.length === 0) { %>
+                <div class="empty-state">
+                    <i data-lucide="users" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                    <p>No voters registered yet.</p>
+                </div>
+            <% } else { %>
+                <div class="voters-filters">
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" data-filter="all">All <span class="filter-count"><%= voters.length %></span></button>
+                        <button class="filter-tab" data-filter="pending">Pending <span class="filter-count"><%= pendingVoters.length %></span></button>
+                        <button class="filter-tab" data-filter="approved">Approved <span class="filter-count"><%= approvedVoters.length %></span></button>
+                        <button class="filter-tab" data-filter="rejected">Rejected <span class="filter-count"><%= rejectedVoters.length %></span></button>
+                    </div>
+                    <div class="filter-search">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                        <input type="text" id="voterSearch" placeholder="Search voters...">
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table" id="votersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% voters.forEach(voter => { %>
+                                <tr data-status="<%= voter.registrationStatus.toLowerCase() %>" data-name="<%= voter.name.toLowerCase() %>" data-email="<%= voter.email.toLowerCase() %>">
+                                    <td><strong><%= voter.name %></strong></td>
+                                    <td><%= voter.email %></td>
+                                    <td>
+                                        <span class="status-badge status-<%= voter.registrationStatus.toLowerCase() %>">
+                                            <%= voter.registrationStatus %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(voter.registrationDate).toLocaleDateString() %></td>
+                                    <td>
+                                        <a href="/admin/voters/<%= voter.voterID %>" class="btn-icon" title="View Details">
+                                            <i data-lucide="eye" style="width: 18px; height: 18px; color: #2563eb;"></i>
+                                        </a>
+                                        <% if (voter.registrationStatus === 'PENDING') { %>
+                                            <button class="btn-icon" data-action="approve-voter" data-voter-id="<%= voter.voterID %>" title="Approve">
+                                                <i data-lucide="check" style="width: 18px; height: 18px; color: #10b981;"></i>
+                                            </button>
+                                            <button class="btn-icon" data-action="reject-voter" data-voter-id="<%= voter.voterID %>" title="Reject">
+                                                <i data-lucide="x" style="width: 18px; height: 18px; color: #ef4444;"></i>
+                                            </button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="no-results-message" id="noVotersMessage" style="display: none;">
+                    <i data-lucide="search-x" style="width: 32px; height: 32px;"></i>
+                    <p>No voters match your filter.</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script src="/public/js/admin.js"></script>
+<script src="/public/js/admin-voters.js"></script>
+
+<%- include('../partials/footer') %>

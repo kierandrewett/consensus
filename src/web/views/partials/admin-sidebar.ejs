@@ -1,0 +1,28 @@
+<div class="admin-sidebar">
+    <div class="admin-brand">
+        <h2><i data-lucide="shield-check" style="width: 20px; height: 20px;"></i> Admin Panel</h2>
+    </div>
+    <nav class="admin-nav">
+        <a href="/admin/dashboard" class="admin-nav-item<%= typeof activePage !== 'undefined' && activePage === 'dashboard' ? ' active' : '' %>">
+            <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i> Dashboard
+        </a>
+        <a href="/admin/elections" class="admin-nav-item<%= typeof activePage !== 'undefined' && activePage === 'elections' ? ' active' : '' %>">
+            <i data-lucide="vote" style="width: 18px; height: 18px;"></i> Elections
+        </a>
+        <a href="/admin/voters" class="admin-nav-item<%= typeof activePage !== 'undefined' && activePage === 'voters' ? ' active' : '' %>">
+            <i data-lucide="users" style="width: 18px; height: 18px;"></i> Voters
+        </a>
+        <a href="/admin/results" class="admin-nav-item<%= typeof activePage !== 'undefined' && activePage === 'results' ? ' active' : '' %>">
+            <i data-lucide="bar-chart" style="width: 18px; height: 18px;"></i> Results
+        </a>
+        <a href="/admin/admins" class="admin-nav-item<%= typeof activePage !== 'undefined' && activePage === 'admins' ? ' active' : '' %>">
+            <i data-lucide="shield" style="width: 18px; height: 18px;"></i> Administrators
+        </a>
+        <a href="/admin/management" class="admin-nav-item<%= typeof activePage !== 'undefined' && activePage === 'management' ? ' active' : '' %>">
+            <i data-lucide="settings" style="width: 18px; height: 18px;"></i> Management
+        </a>
+        <a href="/admin/logout" class="admin-nav-item logout">
+            <i data-lucide="log-out" style="width: 18px; height: 18px;"></i> Logout
+        </a>
+    </nav>
+</div>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote - <%= election.name %></title>
+    <link rel="icon" type="image/x-icon" href="/public/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+    <link rel="stylesheet" href="/public/css/styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <% if (typeof turnstileEnabled !== 'undefined' && turnstileEnabled && turnstileSiteKey) { %>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <% } %>
+</head>
+<body class="vote-body">
+<%- include('../partials/banner') %>
+<%- include('../partials/election-type-helper') %>
+
+<% if (typeof isGuest !== 'undefined' && isGuest) { %>
+<div class="guest-banner">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <i data-lucide="user-x" style="width: 20px; height: 20px;"></i>
+            <span><strong>Guest Mode</strong>: You are voting anonymously. Your IP address is used as your identifier.</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/elections" style="color: inherit; text-decoration: underline;">Browse Elections</a>
+            <a href="/login" style="color: inherit; text-decoration: underline;">Sign In</a>
+            <a href="/register" style="color: inherit; text-decoration: underline;">Register</a>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<div class="vote-page">
+    <div class="vote-layout">
+        <!-- Sidebar -->
+        <aside class="vote-sidebar">
+            <div class="sidebar-section">
+                <div class="ballot-badge">
+                    <i data-lucide="shield-check"></i>
+                    <span>Official Ballot</span>
+                </div>
+                
+                <h1 class="ballot-title"><%= election.name %></h1>
+                <p class="ballot-type"><%- formatElectionType(election.electionType) %></p>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-heading">About</h3>
+                <p class="ballot-description"><%= election.description %></p>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-heading">How to Vote</h3>
+                <ol class="ballot-steps">
+                    <% if (election.electionType === 'FPTP') { %>
+                        <li>Select one candidate from the list</li>
+                        <li>Review your choice carefully</li>
+                        <li>Submit to cast your vote</li>
+                    <% } else { %>
+                        <li>Drag candidates to rank them</li>
+                        <li>Review your ranking carefully</li>
+                        <li>Submit to cast your vote</li>
+                    <% } %>
+                </ol>
+            </div>
+            
+            <div class="sidebar-section sidebar-voter">
+                <h3 class="sidebar-heading">Voter Information</h3>
+                <% if (typeof isGuest !== 'undefined' && isGuest) { %>
+                <div class="guest-voter-info">
+                    <div class="guest-avatar">
+                        <i data-lucide="user-x"></i>
+                    </div>
+                    <span class="guest-label">Guest Voter</span>
+                    <p class="guest-hint">You're voting anonymously using your IP address. <a href="/register">Create an account</a> to track your voting history.</p>
+                </div>
+                <% } else { %>
+                <div class="voter-field">
+                    <span class="voter-label">Full Name</span>
+                    <span class="voter-value"><%= voter.name %></span>
+                </div>
+                <div class="voter-field">
+                    <span class="voter-label">Voter ID</span>
+                    <code class="voter-value voter-id"><%= voter.voterID %></code>
+                </div>
+                <% } %>
+            </div>
+            
+            <div class="sidebar-section sidebar-session">
+                <h3 class="sidebar-heading">Session Details</h3>
+                <div class="voter-field">
+                    <span class="voter-label">Date</span>
+                    <span class="voter-value" id="session-date"></span>
+                </div>
+                <div class="voter-field">
+                    <span class="voter-label">Time</span>
+                    <span class="voter-value" id="session-time"></span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section sidebar-security">
+                <h3 class="sidebar-heading">Security Notice</h3>
+                <ul class="security-list">
+                    <li><i data-lucide="lock"></i> Your vote is encrypted</li>
+                    <li><i data-lucide="eye-off"></i> Your selection is anonymous</li>
+                    <li><i data-lucide="shield"></i> One vote per voter enforced</li>
+                </ul>
+            </div>
+        </aside>
+        
+        <!-- Main Content - Slides -->
+        <main class="vote-main">
+            <div class="vote-slides" id="vote-slides">
+                <% if (typeof turnstileEnabled !== 'undefined' && turnstileEnabled && turnstileSiteKey) { %>
+                <!-- Slide 0: Turnstile Verification -->
+                <div class="vote-slide active" id="slide-turnstile">
+                    <div class="turnstile-panel">
+                        <div class="turnstile-icon">
+                            <i data-lucide="vote"></i>
+                        </div>
+                        <h2 class="turnstile-title">Preparing Your Ballot</h2>
+                        <p class="turnstile-subtitle"><%= election.name %></p>
+                        
+                        <div class="turnstile-verify-section">
+                            <p class="turnstile-label">Verifying your session</p>
+                            <div class="turnstile-widget">
+                                <div class="cf-turnstile" data-sitekey="<%= turnstileSiteKey %>" data-theme="light" data-callback="onTurnstileSuccess"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="turnstile-footer">
+                            <a href="/elections" class="turnstile-cancel">Cancel and return to elections</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Slide 1: Ballot -->
+                <div class="vote-slide" id="slide-ballot">
+                <% } else { %>
+                <!-- Slide 1: Ballot (no Turnstile) -->
+                <div class="vote-slide active" id="slide-ballot">
+                <% } %>
+                    <% if (typeof error !== 'undefined' && error) { %>
+                        <div class="alert alert-error">
+                            <i data-lucide="alert-circle"></i>
+                            <div>
+                                <strong>Failed to cast vote</strong>
+                                <p><%= error %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                    
+                    <form method="POST" action="/vote/<%= election.electionID %>" autocomplete="off" id="ballot-form">
+                        <% if (typeof turnstileEnabled !== 'undefined' && turnstileEnabled && turnstileSiteKey) { %>
+                        <input type="hidden" name="cf-turnstile-response" id="turnstile-token-input" value="">
+                        <% } %>
+                        <div class="ballot-section">
+                            <% if (election.electionType === 'FPTP') { %>
+                                <%- include('../partials/fptp-ballot', { candidates }) %>
+                            <% } else { %>
+                                <%- include('../partials/preferential-ballot', { candidates }) %>
+                            <% } %>
+                        </div>
+                        
+                        <div class="ballot-footer">
+                            <div class="ballot-actions">
+                                <a href="/elections" class="btn btn-secondary">
+                                    <i data-lucide="x"></i>
+                                    Cancel
+                                </a>
+                                <button type="button" class="btn btn-primary" id="review-btn">
+                                    Review Vote
+                                    <i data-lucide="arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Slide 2: Review -->
+                <div class="vote-slide" id="slide-review">
+                    <div class="review-panel">
+                        <div class="review-header">
+                            <i data-lucide="clipboard-check"></i>
+                            <h2>Review Your Vote</h2>
+                        </div>
+                        
+                        <div class="review-warning">
+                            <i data-lucide="alert-triangle"></i>
+                            <p>Please review carefully. Once submitted, your vote <strong>cannot be changed</strong>.</p>
+                        </div>
+                        
+                        <div class="review-section">
+                            <h3>Your Selection</h3>
+                            <div class="review-selection" id="review-selection">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <div class="review-section">
+                            <h3>Election</h3>
+                            <p class="review-value"><%= election.name %></p>
+                        </div>
+                        
+                        <div class="review-section">
+                            <h3>Voter</h3>
+                            <% if (typeof isGuest !== 'undefined' && isGuest) { %>
+                            <div class="review-guest-info">
+                                <i data-lucide="user-x"></i>
+                                <span>Guest Voter</span>
+                            </div>
+                            <% } else { %>
+                            <p class="review-value"><%= voterName %></p>
+                            <p class="review-voter-id"><%= voterID %></p>
+                            <% } %>
+                        </div>
+                        
+                        <div class="review-actions">
+                            <button type="button" class="btn btn-secondary" id="back-btn">
+                                <i data-lucide="arrow-left"></i>
+                                Go Back
+                            </button>
+                            <button type="button" class="btn btn-success" id="confirm-btn">
+                                <i data-lucide="check"></i>
+                                Cast Vote
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Templates for vote summary -->
+<template id="fptp-summary-template">
+    <div class="selection-card">
+        <div class="selection-check">
+            <i data-lucide="check"></i>
+        </div>
+        <div class="selection-info">
+            <strong class="selection-name"></strong>
+            <span class="selection-party"></span>
+        </div>
+    </div>
+</template>
+
+<template id="ranking-summary-template">
+    <div class="ranking-list"></div>
+</template>
+
+<template id="review-ranking-item-template">
+    <div class="ranking-item">
+        <span class="ranking-num"></span>
+        <div class="ranking-info">
+            <strong class="ranking-name"></strong>
+            <span class="ranking-party"></span>
+        </div>
+    </div>
+</template>
+
+<script>
+// Turnstile callback (must be in global scope)
+function onTurnstileSuccess(token) {
+    const tokenInput = document.getElementById('turnstile-token-input');
+    const slideTurnstile = document.getElementById('slide-turnstile');
+    const slideBallot = document.getElementById('slide-ballot');
+    
+    if (tokenInput) {
+        tokenInput.value = token;
+    }
+    
+    // Auto-advance to ballot after brief delay
+    if (slideTurnstile && slideBallot) {
+        setTimeout(() => {
+            slideTurnstile.classList.remove('active');
+            slideBallot.classList.add('active');
+        }, 400);
+    }
+}
+
+(function() {
+    const form = document.getElementById('ballot-form');
+    const slides = document.getElementById('vote-slides');
+    const slideTurnstile = document.getElementById('slide-turnstile');
+    const slideBallot = document.getElementById('slide-ballot');
+    const slideReview = document.getElementById('slide-review');
+    const reviewSelection = document.getElementById('review-selection');
+    
+    const reviewBtn = document.getElementById('review-btn');
+    const backBtn = document.getElementById('back-btn');
+    const confirmBtn = document.getElementById('confirm-btn');
+    
+    const fptpTemplate = document.getElementById('fptp-summary-template');
+    const rankingTemplate = document.getElementById('ranking-summary-template');
+    const rankingItemTemplate = document.getElementById('review-ranking-item-template');
+    
+    const electionType = '<%= election.electionType %>';
+    
+    function getSelectedVote() {
+        if (electionType === 'FPTP') {
+            const selected = form.querySelector('input[name="candidateID"]:checked');
+            if (!selected) return null;
+            
+            const row = selected.closest('.ballot-row');
+            const name = row.querySelector('.ballot-name').textContent;
+            const party = row.querySelector('.ballot-party').textContent;
+            
+            return { type: 'fptp', candidate: { name, party } };
+        } else {
+            const preferencesInput = document.getElementById('preferences-input');
+            if (!preferencesInput || !preferencesInput.value) return null;
+            
+            try {
+                const ids = JSON.parse(preferencesInput.value);
+                if (!ids || ids.length === 0) return null;
+                
+                const rankings = ids.map((id, index) => {
+                    const card = document.querySelector('[data-candidate-id="' + id + '"]');
+                    return {
+                        rank: index + 1,
+                        name: card ? card.dataset.candidateName : 'Unknown',
+                        party: card ? card.dataset.candidateParty : ''
+                    };
+                });
+                
+                return { type: 'preferential', rankings };
+            } catch (e) {
+                return null;
+            }
+        }
+    }
+    
+    function renderSelection(vote) {
+        reviewSelection.innerHTML = '';
+        
+        if (!vote) {
+            reviewSelection.innerHTML = '<p class="no-selection">No selection made</p>';
+            return;
+        }
+        
+        if (vote.type === 'fptp') {
+            const item = fptpTemplate.content.cloneNode(true);
+            item.querySelector('.selection-name').textContent = vote.candidate.name;
+            item.querySelector('.selection-party').textContent = vote.candidate.party;
+            reviewSelection.appendChild(item);
+            lucide.createIcons({ node: reviewSelection });
+        } else {
+            const container = rankingTemplate.content.cloneNode(true);
+            const list = container.querySelector('.ranking-list');
+            
+            vote.rankings.forEach(r => {
+                const item = rankingItemTemplate.content.cloneNode(true);
+                item.querySelector('.ranking-num').textContent = r.rank;
+                item.querySelector('.ranking-name').textContent = r.name;
+                item.querySelector('.ranking-party').textContent = r.party;
+                list.appendChild(item);
+            });
+            
+            reviewSelection.appendChild(container);
+        }
+    }
+    
+    function showSlide(slide) {
+        if (slideTurnstile) slideTurnstile.classList.remove('active');
+        slideBallot.classList.remove('active');
+        slideReview.classList.remove('active');
+        slide.classList.add('active');
+    }
+    
+    reviewBtn.addEventListener('click', () => {
+        const vote = getSelectedVote();
+        
+        if (!vote) {
+            alert('Please make a selection before reviewing your vote.');
+            return;
+        }
+        
+        renderSelection(vote);
+        showSlide(slideReview);
+    });
+    
+    backBtn.addEventListener('click', () => {
+        showSlide(slideBallot);
+    });
+    
+    confirmBtn.addEventListener('click', () => {
+        window.removeEventListener('beforeunload', beforeUnloadHandler);
+        form.submit();
+    });
+    
+    function beforeUnloadHandler(e) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+    }
+    
+    window.addEventListener('beforeunload', beforeUnloadHandler);
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && slideReview.classList.contains('active')) {
+            showSlide(slideBallot);
+        }
+    });
+    
+    // Set session date and time
+    function updateDateTime() {
+        const now = new Date();
+        const dateEl = document.getElementById('session-date');
+        const timeEl = document.getElementById('session-time');
+        
+        if (dateEl) {
+            dateEl.textContent = now.toLocaleDateString('en-GB', { 
+                weekday: 'short', 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+        if (timeEl) {
+            timeEl.textContent = now.toLocaleTimeString('en-GB', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+    }
+    
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+})();
+</script>
+
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<% if (typeof voterID !== 'undefined' && voterID) { %>
+    <%- include('../partials/dashboard-header', { activeTab: 'elections' }) %>
+<% } else { %>
+    <%- include('../partials/header') %>
+<% } %>
+<%- include('../partials/election-type-helper') %>
+
+<div class="elections-container">
+    <a href="/elections" class="back-link">
+        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+        Back to Elections
+    </a>
+
+    <div class="detail-page">
+        <div class="detail-page-header">
+            <div>
+                <h1><%= election.name %></h1>
+                <p><%= election.description %></p>
+            </div>
+            <span class="status-pill <%= election.status === 'ACTIVE' ? 'open' : election.status === 'CLOSED' ? 'closed' : 'scheduled' %>">
+                <%= election.status %>
+            </span>
+        </div>
+        
+        <% if (election.status === 'CLOSED' && winner) { %>
+            <div class="alert alert-success">
+                <i data-lucide="trophy" style="width: 20px; height: 20px;"></i>
+                <div>
+                    <strong>Winner: <%= winner.candidateName %></strong>
+                    <p><%= winner.votes %> votes (<%= winner.percentage.toFixed(1) %>%)</p>
+                    <% if (tieResolution) { %>
+                        <p class="muted">
+                            <% if (tieResolution.resolutionType === 'RANDOM') { %>
+                                Winner determined by random selection due to a tie.
+                            <% } else if (tieResolution.resolutionType === 'MANUAL') { %>
+                                Winner determined by administrator decision.
+                            <% } %>
+                        </p>
+                    <% } %>
+                </div>
+            </div>
+        <% } else if (election.status === 'CLOSED' && results && results.some(r => r.isTied) && !tieResolution) { %>
+            <div class="alert alert-warning">
+                <i data-lucide="alert-triangle" style="width: 20px; height: 20px;"></i>
+                <div>
+                    <strong>Tie Detected</strong>
+                    <p>Awaiting administrator resolution.</p>
+                </div>
+            </div>
+        <% } %>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <span class="info-label">Type</span>
+                <span class="info-value"><%- formatElectionType(election.electionType) %></span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Voting Period</span>
+                <span class="info-value"><%= election.startDate.toLocaleDateString() %> – <%= election.endDate.toLocaleDateString() %></span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Votes Cast</span>
+                <span class="info-value"><%= voteCount %></span>
+            </div>
+        </div>
+        
+        <div class="dashboard-section">
+            <h2>Candidates</h2>
+            <div class="candidate-grid">
+                <% candidates.forEach(candidate => { %>
+                    <div class="candidate-card">
+                        <h3><%= candidate.name %></h3>
+                        <span class="candidate-party"><%= candidate.party %></span>
+                        <p class="candidate-bio"><%= candidate.biography %></p>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        
+        <% if (election.status === 'CLOSED' && results && results.length > 0) { %>
+            <div class="dashboard-section">
+                <h2>Results</h2>
+                <div class="results-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Votes</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% results.forEach(result => { 
+                                const isResolvedWinner = tieResolution && tieResolution.winnerCandidateID === result.candidateID;
+                                const showTiedStyle = result.isTied && !tieResolution;
+                                const rowClass = isResolvedWinner ? 'winner' : (result.isWinner ? 'winner' : (showTiedStyle ? 'tied' : ''));
+                            %>
+                                <tr class="<%= rowClass %>">
+                                    <td><%= result.candidateName %></td>
+                                    <td><%= result.votes %></td>
+                                    <td><%= result.percentage.toFixed(2) %>%</td>
+                                    <td>
+                                        <% if (isResolvedWinner) { %>
+                                            <span class="status-badge winner-badge">
+                                                <i data-lucide="trophy" class="icon-sm"></i> Winner
+                                            </span>
+                                        <% } else if (result.isWinner && !result.isTied) { %>
+                                            <span class="status-badge winner-badge">
+                                                <i data-lucide="trophy" class="icon-sm"></i> Winner
+                                            </span>
+                                        <% } else if (result.isTied && !tieResolution) { %>
+                                            <span class="status-badge tied-badge">
+                                                <i data-lucide="alert-circle" class="icon-sm"></i> Tied
+                                            </span>
+                                        <% } else if (tieResolution && tieResolution.resolutionType === 'RECALL' && result.isTied) { %>
+                                            <span class="status-badge tied-badge">
+                                                <i data-lucide="refresh-cw" class="icon-sm"></i> Recall
+                                            </span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <% } %>
+        
+        <div class="detail-actions">
+            <% if (election.status === 'ACTIVE') { %>
+                <a href="/vote/<%= election.electionID %>" class="btn btn-primary">
+                    <i data-lucide="vote" style="width: 18px; height: 18px;"></i>
+                    Vote Now
+                </a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<% if (typeof voterID !== 'undefined' && voterID) { %>
+    <%- include('../partials/dashboard-footer') %>
+<% } else { %>
+    <%- include('../partials/footer') %>
+<% } %>

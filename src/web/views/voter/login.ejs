@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Consensus</title>
+    <link rel="icon" type="image/x-icon" href="/public/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+    <link rel="stylesheet" href="/public/css/styles.css">
+</head>
+<body class="auth-page">
+<%- include('../partials/banner') %>
+
+<div class="auth-layout">
+    <div class="auth-brand">
+        <div class="auth-brand-content">
+            <i data-lucide="vote" style="width: 48px; height: 48px;"></i>
+            <h2>Consensus</h2>
+        </div>
+    </div>
+    <div class="auth-panel">
+        <div class="auth-form-wrapper">
+            <a href="/" class="auth-back">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                Back to home
+            </a>
+            
+            <div class="auth-header">
+                <h1>Welcome back</h1>
+                <p>Sign in to access your voter dashboard</p>
+            </div>
+            
+            <% if (error) { %>
+                <div class="alert alert-error">
+                    <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                    <span><%= error %></span>
+                </div>
+            <% } %>
+            
+            <% if (typeof loginEnabled !== 'undefined' && !loginEnabled) { %>
+            <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                <i data-lucide="lock" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                <span>Login is currently disabled. Please check back later.</span>
+            </div>
+            <% } else { %>
+            <form method="POST" action="/login" class="auth-form">
+                <% if (redirectTo) { %>
+                    <input type="hidden" name="redirectTo" value="<%= redirectTo %>">
+                <% } %>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+            <% } %>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="/register">Create one</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/public/js/lucide.js"></script>
+</body>
+</html>

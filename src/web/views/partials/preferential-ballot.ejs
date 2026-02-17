@@ -1,0 +1,586 @@
+<h2>Rank Candidates by Preference</h2>
+<p>Preferential Voting — Click or drag candidates to rank them in your preferred order.</p>
+
+<div class="ballot-instructions">
+    <i data-lucide="info"></i>
+    <span>Drag to reorder. Click the × to remove a candidate from your ranking.</span>
+</div>
+
+<!-- Templates for dynamic content -->
+<template id="empty-ranking-template">
+    <div class="empty-ranking">
+        <i data-lucide="grip-vertical" style="width: 24px; height: 24px;"></i>
+        <p>Drag candidates here or click to rank</p>
+    </div>
+</template>
+
+<template id="ranking-item-template">
+    <div class="ranking-item" draggable="true">
+        <span class="drag-handle"><i data-lucide="grip-vertical" style="width: 14px; height: 14px;"></i></span>
+        <span class="ranking-number"></span>
+        <div class="ranking-details">
+            <span class="ranking-name"></span>
+            <span class="ranking-party"></span>
+            <p class="ranking-bio"></p>
+        </div>
+        <button type="button" class="remove-ranking" title="Remove from ranking">
+            <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+        </button>
+    </div>
+</template>
+
+<div class="ranking-container">
+    <div class="candidates-to-rank">
+        <h3>Candidates</h3>
+        <div class="candidate-list" id="candidate-list">
+            <% candidates.forEach((candidate, index) => { %>
+                <div class="rankable-candidate" 
+                     draggable="true"
+                     data-candidate-id="<%= candidate.candidateID %>" 
+                     data-candidate-name="<%= candidate.name %>"
+                     data-candidate-party="<%= candidate.party %>"
+                     data-candidate-bio="<%= candidate.biography %>">
+                    <span class="drag-handle"><i data-lucide="grip-vertical" style="width: 16px; height: 16px;"></i></span>
+                    <div class="rank-badge"></div>
+                    <div class="candidate-details">
+                        <strong><%= candidate.name %></strong>
+                        <span class="candidate-party"><%= candidate.party %></span>
+                        <p class="candidate-bio"><%= candidate.biography %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    
+    <div class="your-ranking">
+        <h3>Your Ranking</h3>
+        <div class="ranking-preview" id="ranking-preview">
+            <div class="empty-ranking">
+                <i data-lucide="grip-vertical" style="width: 24px; height: 24px;"></i>
+                <p>Drag candidates here or click to rank</p>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="clear-ranking" style="display: none;">
+            <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+            Clear All
+        </button>
+    </div>
+</div>
+
+<input type="hidden" name="preferences" id="preferences-input">
+
+<script>
+(function() {
+    const candidateList = document.getElementById('candidate-list');
+    const rankingPreview = document.getElementById('ranking-preview');
+    const preferencesInput = document.getElementById('preferences-input');
+    const clearBtn = document.getElementById('clear-ranking');
+    
+    // Templates
+    const emptyTemplate = document.getElementById('empty-ranking-template');
+    const itemTemplate = document.getElementById('ranking-item-template');
+    
+    // Rankings: array of { id, name, party, bio }
+    let rankings = [];
+    
+    // Drag state
+    let draggedItem = null;
+    let dragSource = null; // 'candidates' or 'ranking'
+    
+    function getCandidateData(id) {
+        const card = candidateList.querySelector('[data-candidate-id="' + id + '"]');
+        if (!card) return null;
+        return {
+            id: card.dataset.candidateId,
+            name: card.dataset.candidateName,
+            party: card.dataset.candidateParty,
+            bio: card.dataset.candidateBio
+        };
+    }
+    
+    function updateUI() {
+        // Update candidate cards (show rank badges)
+        document.querySelectorAll('.rankable-candidate').forEach(function(card) {
+            const candidateId = card.dataset.candidateId;
+            const rankIndex = rankings.findIndex(function(r) { return r.id === candidateId; });
+            const badge = card.querySelector('.rank-badge');
+            
+            if (rankIndex >= 0) {
+                card.classList.add('ranked');
+                badge.textContent = rankIndex + 1;
+                badge.style.display = 'flex';
+            } else {
+                card.classList.remove('ranked');
+                badge.textContent = '';
+                badge.style.display = 'none';
+            }
+        });
+        
+        // Update ranking preview using templates
+        rankingPreview.innerHTML = '';
+        
+        if (rankings.length === 0) {
+            const empty = emptyTemplate.content.cloneNode(true);
+            rankingPreview.appendChild(empty);
+            clearBtn.style.display = 'none';
+        } else {
+            rankings.forEach(function(r, i) {
+                const item = itemTemplate.content.cloneNode(true);
+                const div = item.querySelector('.ranking-item');
+                
+                div.dataset.candidateId = r.id;
+                div.querySelector('.ranking-number').textContent = i + 1;
+                div.querySelector('.ranking-name').textContent = r.name;
+                div.querySelector('.ranking-party').textContent = r.party;
+                div.querySelector('.ranking-bio').textContent = r.bio;
+                
+                // Drag handlers for ranking items
+                div.addEventListener('dragstart', handleRankingDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+                div.addEventListener('dragover', handleRankingDragOver);
+                div.addEventListener('drop', handleRankingDrop);
+                
+                rankingPreview.appendChild(item);
+            });
+            clearBtn.style.display = '';
+        }
+        
+        // Update hidden input
+        preferencesInput.value = JSON.stringify(rankings.map(function(r) { return r.id; }));
+    }
+    
+    function addToRanking(candidateId, atIndex) {
+        if (rankings.find(function(r) { return r.id === candidateId; })) return;
+        
+        const data = getCandidateData(candidateId);
+        if (!data) return;
+        
+        if (typeof atIndex === 'number' && atIndex >= 0 && atIndex < rankings.length) {
+            rankings.splice(atIndex, 0, data);
+        } else {
+            rankings.push(data);
+        }
+        updateUI();
+    }
+    
+    function removeFromRanking(candidateId) {
+        rankings = rankings.filter(function(r) { return r.id !== candidateId; });
+        updateUI();
+    }
+    
+    function moveInRanking(fromIndex, toIndex) {
+        if (fromIndex === toIndex) return;
+        const item = rankings.splice(fromIndex, 1)[0];
+        rankings.splice(toIndex, 0, item);
+        updateUI();
+    }
+    
+    function toggleRanking(candidateId) {
+        if (rankings.find(function(r) { return r.id === candidateId; })) {
+            removeFromRanking(candidateId);
+        } else {
+            addToRanking(candidateId);
+        }
+    }
+    
+    // ========== DRAG & DROP ==========
+    
+    // Candidate card drag start
+    function handleCandidateDragStart(e) {
+        const card = e.target.closest('.rankable-candidate');
+        if (!card) return;
+        
+        draggedItem = card.dataset.candidateId;
+        dragSource = 'candidates';
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', card.dataset.candidateId);
+    }
+    
+    // Ranking item drag start
+    function handleRankingDragStart(e) {
+        const item = e.target.closest('.ranking-item');
+        if (!item) return;
+        
+        draggedItem = item.dataset.candidateId;
+        dragSource = 'ranking';
+        item.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', item.dataset.candidateId);
+    }
+    
+    function handleDragEnd(e) {
+        const el = e.target.closest('.rankable-candidate, .ranking-item');
+        if (el) el.classList.remove('dragging');
+        
+        document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+        rankingPreview.classList.remove('drag-over');
+        
+        draggedItem = null;
+        dragSource = null;
+    }
+    
+    // Drag over ranking preview (drop zone)
+    function handlePreviewDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        rankingPreview.classList.add('drag-over');
+    }
+    
+    function handlePreviewDragLeave(e) {
+        if (!rankingPreview.contains(e.relatedTarget)) {
+            rankingPreview.classList.remove('drag-over');
+        }
+    }
+    
+    // Drop on ranking preview (empty area or end)
+    function handlePreviewDrop(e) {
+        e.preventDefault();
+        rankingPreview.classList.remove('drag-over');
+        
+        const candidateId = e.dataTransfer.getData('text/plain');
+        if (!candidateId) return;
+        
+        if (dragSource === 'candidates') {
+            // Add new candidate to end
+            addToRanking(candidateId);
+        } else if (dragSource === 'ranking') {
+            // Move to end
+            const fromIndex = rankings.findIndex(function(r) { return r.id === candidateId; });
+            if (fromIndex >= 0) {
+                moveInRanking(fromIndex, rankings.length - 1);
+            }
+        }
+    }
+    
+    // Drag over ranking item (for reordering)
+    function handleRankingDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        const item = e.target.closest('.ranking-item');
+        if (item && item.dataset.candidateId !== draggedItem) {
+            // Remove drag-over from others
+            document.querySelectorAll('.ranking-item.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+            item.classList.add('drag-over');
+        }
+    }
+    
+    // Drop on ranking item (reorder)
+    function handleRankingDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const item = e.target.closest('.ranking-item');
+        if (!item) return;
+        
+        const targetId = item.dataset.candidateId;
+        const candidateId = e.dataTransfer.getData('text/plain');
+        if (!candidateId || candidateId === targetId) return;
+        
+        const toIndex = rankings.findIndex(function(r) { return r.id === targetId; });
+        
+        if (dragSource === 'candidates') {
+            // Add at specific position
+            addToRanking(candidateId, toIndex);
+        } else if (dragSource === 'ranking') {
+            // Reorder
+            const fromIndex = rankings.findIndex(function(r) { return r.id === candidateId; });
+            if (fromIndex >= 0 && toIndex >= 0) {
+                moveInRanking(fromIndex, toIndex);
+            }
+        }
+        
+        item.classList.remove('drag-over');
+    }
+    
+    // ========== EVENT LISTENERS ==========
+    
+    // Candidate cards: click and drag
+    candidateList.addEventListener('click', function(e) {
+        const card = e.target.closest('.rankable-candidate');
+        if (card && !e.target.closest('.drag-handle')) {
+            toggleRanking(card.dataset.candidateId);
+        }
+    });
+    
+    candidateList.querySelectorAll('.rankable-candidate').forEach(function(card) {
+        card.addEventListener('dragstart', handleCandidateDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+    });
+    
+    // Ranking preview: drop zone
+    rankingPreview.addEventListener('dragover', handlePreviewDragOver);
+    rankingPreview.addEventListener('dragleave', handlePreviewDragLeave);
+    rankingPreview.addEventListener('drop', handlePreviewDrop);
+    
+    // Ranking preview: remove button clicks (event delegation)
+    rankingPreview.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-ranking');
+        if (removeBtn) {
+            e.stopPropagation();
+            const item = removeBtn.closest('.ranking-item');
+            if (item && item.dataset.candidateId) {
+                removeFromRanking(item.dataset.candidateId);
+            }
+        }
+    });
+    
+    // Clear all
+    clearBtn.addEventListener('click', function() {
+        rankings = [];
+        updateUI();
+    });
+    
+    // Initial UI
+    updateUI();
+})();
+</script>
+
+<style>
+.ballot-instructions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    padding: 1rem;
+    border-radius: 8px;
+    color: #0369a1;
+    margin-bottom: 1.5rem;
+}
+
+.ranking-container {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    .ranking-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.candidates-to-rank h3,
+.your-ranking h3 {
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.candidate-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rankable-candidate {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.rankable-candidate:hover {
+    border-color: var(--brand);
+}
+
+.rankable-candidate.ranked {
+    border-color: var(--success);
+    background: #f0fdf4;
+}
+
+.rankable-candidate.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+    transition: opacity 0.2s;
+}
+
+.drag-handle {
+    cursor: grab;
+    color: var(--muted);
+    padding: 0.25rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.rank-badge {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--success);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.candidate-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.candidate-details strong {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.candidate-party {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.candidate-bio {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+    line-height: 1.4;
+}
+
+.your-ranking {
+    position: sticky;
+    top: 1rem;
+}
+
+.ranking-preview {
+    background: var(--bg);
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    min-height: 250px;
+}
+
+.ranking-preview.drag-over {
+    border-color: var(--brand);
+    background: #eff6ff;
+}
+
+.empty-ranking {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--muted);
+    text-align: center;
+}
+
+.empty-ranking p {
+    margin: 0.5rem 0 0;
+}
+
+.ranking-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    cursor: grab;
+    transition: all 0.15s;
+    user-select: none;
+}
+
+.ranking-item:last-child {
+    margin-bottom: 0;
+}
+
+.ranking-item:hover {
+    border-color: var(--brand);
+}
+
+.ranking-item.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+}
+
+.ranking-item.drag-over {
+    border-color: var(--brand);
+    border-width: 2px;
+    background: #eff6ff;
+}
+
+.ranking-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--brand);
+    color: white;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.ranking-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.ranking-name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.ranking-party {
+    display: block;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 0.125rem;
+}
+
+.ranking-bio {
+    margin: 0.375rem 0 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.3;
+}
+
+.remove-ranking {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: var(--muted);
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.remove-ranking:hover {
+    background: #fef2f2;
+    color: var(--danger);
+}
+
+.remove-ranking i,
+.remove-ranking svg {
+    pointer-events: none;
+}
+
+#clear-ranking {
+    margin-top: 1rem;
+    width: 100%;
+}
+</style>

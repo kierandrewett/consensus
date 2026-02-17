@@ -1,0 +1,18 @@
+<nav class="dashboard-tabs">
+    <a href="/dashboard" class="dashboard-tab<%= activeTab === 'overview' ? ' active' : '' %>">
+        <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+        Overview
+    </a>
+    <a href="/elections" class="dashboard-tab<%= activeTab === 'elections' ? ' active' : '' %>">
+        <i data-lucide="vote" style="width: 18px; height: 18px;"></i>
+        Elections
+    </a>
+    <a href="/confirmations" class="dashboard-tab<%= activeTab === 'history' ? ' active' : '' %>">
+        <i data-lucide="file-check" style="width: 18px; height: 18px;"></i>
+        History
+    </a>
+    <a href="/profile" class="dashboard-tab<%= activeTab === 'settings' ? ' active' : '' %>">
+        <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+        Settings
+    </a>
+</nav>

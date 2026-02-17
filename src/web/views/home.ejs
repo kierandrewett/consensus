@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<% if (deleted) { %>
+<div class="alert alert-success" style="position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; align-items: center; gap: 0.5rem; padding: 1rem 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
+    Your account has been successfully deleted.
+</div>
+<% } %>
+
+<div class="landing">
+    <section class="landing-hero">
+        <h1>Democracy made simple <i data-lucide="vote" style="width: 48px; height: 48px; color: var(--brand);"></i></h1>
+        <p class="landing-subtitle">An e-voting system supporting plurality, approval, and ranked-choice elections.</p>
+        <div class="landing-cta">
+            <a href="/register" class="btn btn-primary btn-lg">Register</a>
+            <a href="/login" class="btn btn-secondary btn-lg">Log In</a>
+        </div>
+    </section>
+    
+    <section class="landing-features">
+        <div class="feature">
+            <div class="feature-icon">
+                <i data-lucide="shield-check" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h3>Secure</h3>
+            <p>Voters can only vote once per election</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">
+                <i data-lucide="list-ordered" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h3>Multiple Methods</h3>
+            <p>Choose how votes are cast and counted</p>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">
+                <i data-lucide="bar-chart-3" style="width: 24px; height: 24px;"></i>
+            </div>
+            <h3>Results</h3>
+            <p>See vote counts and winners when polls close</p>
+        </div>
+    </section>
+</div>
+
+<%- include('partials/footer') %>

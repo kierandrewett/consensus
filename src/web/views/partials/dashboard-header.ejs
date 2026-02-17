@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Consensus</title>
+    <link rel="icon" type="image/x-icon" href="/public/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+    <link rel="stylesheet" href="/public/css/styles.css">
+</head>
+<body>
+    <%- include('banner') %>
+    <header class="dashboard-header-bar">
+        <div class="container">
+            <a href="/" class="brand">
+                <i data-lucide="vote" style="width: 24px; height: 24px;"></i>
+                <span>Consensus</span>
+            </a>
+            <div class="nav-links">
+                <% if (typeof voterID !== 'undefined' && voterID) { %>
+                    <span class="nav-user"><%= voterName %></span>
+                    <a href="/logout" class="nav-link nav-link-muted">Logout</a>
+                <% } else { %>
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/register" class="nav-link nav-link-muted">Register</a>
+                <% } %>
+            </div>
+        </div>
+        <div class="dashboard-hero">
+            <div class="container">
+                <% if (activeTab === 'overview') { %>
+                    <h1>Welcome back, <%= typeof voterName !== 'undefined' ? voterName.split(' ')[0] : 'Guest' %></h1>
+                    <p>Your voting dashboard</p>
+                <% } else if (activeTab === 'elections') { %>
+                    <h1>Elections</h1>
+                    <p>View and participate in elections</p>
+                <% } else if (activeTab === 'history') { %>
+                    <h1>Voting History</h1>
+                    <p>Your past votes and receipts</p>
+                <% } else if (activeTab === 'settings') { %>
+                    <h1>Settings</h1>
+                    <p>Manage your account</p>
+                <% } %>
+            </div>
+        </div>
+        <nav class="dashboard-tabs-bar">
+            <div class="container">
+                <%- include('./dashboard-tabs', { activeTab: activeTab }) %>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-content">

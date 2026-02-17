@@ -1,0 +1,137 @@
+<% if (typeof voterID !== 'undefined' && voterID) { %>
+    <%- include('../partials/dashboard-header', { activeTab: 'elections' }) %>
+<% } else { %>
+    <%- include('../partials/header') %>
+    <div class="page-header">
+        <h1>Elections</h1>
+        <p>View active and upcoming elections</p>
+    </div>
+<% } %>
+<%- include('../partials/election-type-helper') %>
+
+<% if (typeof isGuest !== 'undefined' && isGuest && typeof guestVotingEnabled !== 'undefined' && guestVotingEnabled) { %>
+<div class="guest-explainer">
+    <div class="guest-explainer-icon">
+        <i data-lucide="user-x"></i>
+    </div>
+    <div class="guest-explainer-content">
+        <h3>You're browsing as a Guest</h3>
+        <p>Your votes are tracked using your IP address. This means:</p>
+        <ul>
+            <li><strong>Anyone on your network</strong> (same household, office, or Wi-Fi) shares the same IP address and could vote on your behalf.</li>
+            <li><strong>Your vote is not tied to a verified identity</strong> so there's no way to prove it was you who voted.</li>
+            <li><strong>If your IP changes</strong> (e.g., switching networks), you may appear as a different voter.</li>
+        </ul>
+        <p class="guest-explainer-cta">
+            For a more secure voting experience, <a href="/register">create an account</a> or <a href="/login">sign in</a>.
+        </p>
+    </div>
+</div>
+<% } %>
+
+<div class="elections-container">
+
+<% 
+    const votedSet = new Set(votedElections || []);
+    const now = new Date();
+    const canVoteElections = elections.filter(e => !votedSet.has(e.electionID) && now >= e.startDate && now <= e.endDate);
+    const scheduledElections = elections.filter(e => !votedSet.has(e.electionID) && now < e.startDate);
+    const votedInElections = elections.filter(e => votedSet.has(e.electionID));
+    const pastElections = closedElections || [];
+%>
+    
+    <% if (canVoteElections.length === 0 && scheduledElections.length === 0 && votedInElections.length === 0 && pastElections.length === 0) { %>
+        <div class="empty-message">
+            <i data-lucide="inbox" style="width: 32px; height: 32px;"></i>
+            <p>No elections at the moment</p>
+        </div>
+    <% } else { %>
+        
+        <% if (canVoteElections.length > 0) { %>
+            <div class="dashboard-section">
+                <h2>Ready to Vote</h2>
+                <div class="election-grid">
+                    <% canVoteElections.forEach(election => { %>
+                        <div class="election-card">
+                            <div class="election-card-header">
+                                <span class="election-badge open">Open</span>
+                            </div>
+                            <h3><%= election.name %></h3>
+                            <p class="election-type"><%- formatElectionType(election.electionType) %></p>
+                            <p class="election-countdown" data-end="<%= election.endDate.toISOString() %>">Loading...</p>
+                            <div class="election-card-actions">
+                                <a href="/vote/<%= election.electionID %>" class="btn btn-primary">Vote Now</a>
+                                <a href="/elections/<%= election.electionID %>" class="btn btn-secondary">Details</a>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+        
+        <% if (scheduledElections.length > 0) { %>
+            <div class="dashboard-section">
+                <h2>Upcoming</h2>
+                <div class="election-grid">
+                    <% scheduledElections.forEach(election => { %>
+                        <div class="election-card muted">
+                            <div class="election-card-header">
+                                <span class="election-badge scheduled">Scheduled</span>
+                            </div>
+                            <h3><%= election.name %></h3>
+                            <p class="election-type"><%- formatElectionType(election.electionType) %></p>
+                            <p class="election-date">Opens <%= election.startDate.toLocaleDateString() %></p>
+                            <a href="/elections/<%= election.electionID %>" class="btn btn-secondary btn-block">View Details</a>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+        
+        <% if (votedInElections.length > 0) { %>
+            <div class="dashboard-section">
+                <h2>Already Voted</h2>
+                <div class="election-grid">
+                    <% votedInElections.forEach(election => { %>
+                        <div class="election-card">
+                            <div class="election-card-header">
+                                <span class="election-badge voted">Voted</span>
+                            </div>
+                            <h3><%= election.name %></h3>
+                            <p class="election-type"><%- formatElectionType(election.electionType) %></p>
+                            <a href="/elections/<%= election.electionID %>" class="btn btn-secondary btn-block">View Details</a>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+        
+        <% if (pastElections.length > 0) { %>
+            <div class="dashboard-section">
+                <h2>Past Elections</h2>
+                <div class="election-grid">
+                    <% pastElections.forEach(election => { %>
+                        <div class="election-card muted">
+                            <div class="election-card-header">
+                                <span class="election-badge closed">Closed</span>
+                            </div>
+                            <h3><%= election.name %></h3>
+                            <p class="election-type"><%- formatElectionType(election.electionType) %></p>
+                            <p class="election-date">Ended <%= election.endDate.toLocaleDateString() %></p>
+                            <a href="/elections/<%= election.electionID %>" class="btn btn-secondary btn-block">View Results</a>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+        
+    <% } %>
+</div>
+
+<script src="/public/js/countdown.js"></script>
+
+<% if (typeof voterID !== 'undefined' && voterID) { %>
+    <%- include('../partials/dashboard-footer') %>
+<% } else { %>
+    <%- include('../partials/footer') %>
+<% } %>

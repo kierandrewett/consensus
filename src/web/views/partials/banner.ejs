@@ -1,0 +1,14 @@
+<% if (typeof testMode !== 'undefined' && testMode) { %>
+<div class="test-mode-banner">
+    <div class="test-mode-banner-content">
+        <span class="test-mode-text">TEST MODE</span>
+    </div>
+</div>
+<% } %>
+<% if (typeof siteBanner !== 'undefined' && siteBanner) { %>
+<div class="site-banner site-banner-<%= siteBanner.type %>">
+    <div class="container">
+        <span><%= siteBanner.message %></span>
+    </div>
+</div>
+<% } %>

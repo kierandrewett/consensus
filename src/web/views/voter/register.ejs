@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Consensus</title>
+    <link rel="icon" type="image/x-icon" href="/public/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+    <link rel="stylesheet" href="/public/css/styles.css">
+</head>
+<body class="auth-page">
+<%- include('../partials/banner') %>
+
+<div class="auth-layout">
+    <div class="auth-brand">
+        <div class="auth-brand-content">
+            <i data-lucide="vote" style="width: 48px; height: 48px;"></i>
+            <h2>Consensus</h2>
+        </div>
+    </div>
+    <div class="auth-panel">
+        <div class="auth-form-wrapper">
+            <a href="/" class="auth-back">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                Back to home
+            </a>
+            
+            <div class="auth-header">
+                <h1>Create account</h1>
+                <p>Register to participate in elections</p>
+            </div>
+            
+            <% if (error) { %>
+                <div class="alert alert-error">
+                    <i data-lucide="alert-circle" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                    <span><%= error %></span>
+                </div>
+            <% } %>
+            
+            <% if (typeof signupEnabled !== 'undefined' && !signupEnabled) { %>
+            <div class="alert alert-warning" style="margin-bottom: 1rem;">
+                <i data-lucide="lock" style="width: 18px; height: 18px; flex-shrink: 0;"></i>
+                <span>Registration is currently disabled. Please check back later.</span>
+            </div>
+            <% } else { %>
+            <form method="POST" action="/register" class="auth-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" value="<%= formName %>" placeholder="Your full name" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="<%= formEmail %>" placeholder="you@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Create a strong password" required>
+                    
+                    <div class="password-strength" id="passwordStrength" hidden>
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthBar"></div>
+                        </div>
+                        <span class="strength-label" id="strengthText"></span>
+                    </div>
+                    
+                    <ul class="password-requirements" id="passwordRequirements" hidden>
+                        <li id="req-length"><i data-lucide="circle" style="width: 12px; height: 12px;"></i> At least 8 characters</li>
+                        <li id="req-strength"><i data-lucide="circle" style="width: 12px; height: 12px;"></i> Strong (not easily guessable)</li>
+                        <li id="req-no-personal"><i data-lucide="circle" style="width: 12px; height: 12px;"></i> No name or email in password</li>
+                    </ul>
+                    
+                    <p class="password-feedback" id="passwordFeedback"></p>
+                </div>
+                
+                <% if (typeof turnstileEnabled !== 'undefined' && turnstileEnabled && turnstileSiteKey) { %>
+                <div class="form-group">
+                    <div class="cf-turnstile" data-sitekey="<%= turnstileSiteKey %>" data-theme="light"></div>
+                </div>
+                <% } %>
+                
+                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">Create Account</button>
+            </form>
+            <% } %>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="/login">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (typeof turnstileEnabled !== 'undefined' && turnstileEnabled && turnstileSiteKey) { %>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<% } %>
+<script src="/public/js/register.js"></script>
+<script src="/public/js/lucide.js"></script>
+</body>
+</html>

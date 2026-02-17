@@ -1,0 +1,104 @@
+<%- include('../partials/header') %>
+
+<div class="admin-dashboard">
+    <%- include('../partials/admin-sidebar', { activePage: 'voters' }) %>
+    
+    <div class="admin-content">
+        <div class="admin-header">
+            <div class="admin-header-info">
+                <a href="/admin/voters" class="back-link">
+                    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                    Back to Voters
+                </a>
+                <h1><%= voter.name %></h1>
+                <p><%= voter.email %></p>
+            </div>
+        </div>
+        
+        <div class="admin-stats" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="<%= voter.registrationStatus === 'APPROVED' ? 'check-circle' : voter.registrationStatus === 'PENDING' ? 'clock' : 'x-circle' %>" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><%= voter.registrationStatus %></h3>
+                    <p>Status</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="calendar" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><%= new Date(voter.registrationDate).toLocaleDateString() %></h3>
+                    <p>Registered</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="fingerprint" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 style="font-size: 0.8125rem; font-family: monospace;"><%= voter.voterID.substring(0, 8) %>...</h3>
+                    <p>Voter ID</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-section">
+            <h2>Voter Information</h2>
+            <div class="info-table">
+                <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value"><%= voter.name %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email Address</span>
+                    <span class="info-value"><%= voter.email %></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Voter ID</span>
+                    <code class="info-code"><%= voter.voterID %></code>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Registration Date</span>
+                    <span class="info-value"><%= new Date(voter.registrationDate).toLocaleDateString() %> at <%= new Date(voter.registrationDate).toLocaleTimeString() %></span>
+                </div>
+            </div>
+        </div>
+        
+        <% if (voter.registrationStatus === 'PENDING') { %>
+        <div class="admin-section">
+            <h2>Pending Actions</h2>
+            <div class="action-card">
+                <div class="action-row">
+                    <div>
+                        <strong>Approve Registration</strong>
+                        <p>Allow this voter to participate in elections</p>
+                    </div>
+                    <button class="btn btn-primary" data-action="approve-voter" data-voter-id="<%= voter.voterID %>">
+                        <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                        Approve
+                    </button>
+                </div>
+                <div class="action-row">
+                    <div>
+                        <strong>Reject Registration</strong>
+                        <p>Deny access to elections</p>
+                    </div>
+                    <button class="btn btn-danger" data-action="reject-voter" data-voter-id="<%= voter.voterID %>">
+                        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                        Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script src="/public/js/admin.js"></script>
+
+<%- include('../partials/footer') %>

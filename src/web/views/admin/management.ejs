@@ -1,0 +1,250 @@
+<%- include('../partials/header') %>
+
+<div class="admin-dashboard">
+    <%- include('../partials/admin-sidebar', { activePage: 'management' }) %>
+    
+    <div class="admin-content">
+        <div class="admin-header">
+            <div class="admin-header-info">
+                <h1>System Management</h1>
+                <p>Configure system-wide settings</p>
+            </div>
+        </div>
+        
+        <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+            <i data-lucide="check-circle" style="width: 20px; height: 20px;"></i>
+            <span><%= success %></span>
+        </div>
+        <% } %>
+        
+        <form action="/admin/management" method="POST" class="settings-form">
+            <!-- Banner Settings -->
+            <div class="management-section">
+                <div class="section-header">
+                    <i data-lucide="megaphone"></i>
+                    <h2>Site Banner</h2>
+                </div>
+                <p class="section-description">Display an announcement banner at the top of the site for all users.</p>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="bannerEnabled" id="bannerEnabled" 
+                               <%= settings.bannerEnabled ? 'checked' : '' %>>
+                        <span class="checkbox-text">Enable Banner</span>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bannerType">Banner Type</label>
+                    <select name="bannerType" id="bannerType">
+                        <option value="info" <%= settings.bannerType === 'info' ? 'selected' : '' %>>Info (Blue)</option>
+                        <option value="warning" <%= settings.bannerType === 'warning' ? 'selected' : '' %>>Warning (Yellow)</option>
+                        <option value="error" <%= settings.bannerType === 'error' ? 'selected' : '' %>>Error (Red)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bannerMessage">Banner Message</label>
+                    <textarea name="bannerMessage" id="bannerMessage" rows="2" 
+                              placeholder="Enter your announcement message..."><%= settings.bannerMessage || '' %></textarea>
+                </div>
+            </div>
+            
+            <!-- Access Control -->
+            <div class="management-section">
+                <div class="section-header">
+                    <i data-lucide="shield"></i>
+                    <h2>Access Control</h2>
+                </div>
+                <p class="section-description">Control user registration and login access.</p>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="autoApprovalEnabled" id="autoApprovalEnabled" 
+                               <%= settings.autoApprovalEnabled ? 'checked' : '' %>>
+                        <div>
+                            <span class="checkbox-text">Auto-Approve New Voters</span>
+                            <p class="checkbox-description">When enabled, new registrations are automatically approved. When disabled, admins must approve each voter.</p>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="signupEnabled" id="signupEnabled" 
+                               <%= settings.signupEnabled ? 'checked' : '' %>>
+                        <div>
+                            <span class="checkbox-text">Allow New Registrations</span>
+                            <p class="checkbox-description">When disabled, new voters cannot sign up.</p>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="loginEnabled" id="loginEnabled" 
+                               <%= settings.loginEnabled ? 'checked' : '' %>>
+                        <div>
+                            <span class="checkbox-text">Allow Voter Login</span>
+                            <p class="checkbox-description">When disabled, voters cannot log in (admin login still works).</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Guest Voting -->
+            <div class="management-section">
+                <div class="section-header">
+                    <i data-lucide="user-x"></i>
+                    <h2>Guest Voting</h2>
+                </div>
+                <p class="section-description">Allow anonymous users to vote without registering. Requires auto-approval to be enabled.</p>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="guestVotingEnabled" id="guestVotingEnabled" 
+                               <%= settings.guestVotingEnabled ? 'checked' : '' %>>
+                        <div>
+                            <span class="checkbox-text">Enable Guest Voting</span>
+                            <p class="checkbox-description">When enabled, guests can vote using their IP address as identifier. One vote per IP per election.</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Maintenance Mode -->
+            <div class="management-section">
+                <div class="section-header">
+                    <i data-lucide="wrench"></i>
+                    <h2>Maintenance Mode</h2>
+                </div>
+                <p class="section-description">Enable maintenance mode to temporarily take the site offline for voters.</p>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="maintenanceMode" id="maintenanceMode" 
+                               <%= settings.maintenanceMode ? 'checked' : '' %>>
+                        <div>
+                            <span class="checkbox-text">Enable Maintenance Mode</span>
+                            <p class="checkbox-description">When enabled, voters will see a maintenance page instead of the normal site.</p>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="maintenanceMessage">Maintenance Message</label>
+                    <textarea name="maintenanceMessage" id="maintenanceMessage" rows="2" 
+                              placeholder="We're currently performing maintenance. Please check back later."><%= settings.maintenanceMessage || '' %></textarea>
+                </div>
+            </div>
+            
+            <!-- Cloudflare Turnstile -->
+            <div class="management-section">
+                <div class="section-header">
+                    <i data-lucide="shield-check"></i>
+                    <h2>Cloudflare Turnstile</h2>
+                </div>
+                <p class="section-description">Add CAPTCHA protection to registration and voting pages using Cloudflare Turnstile.</p>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="turnstileEnabled" id="turnstileEnabled" 
+                               <%= settings.turnstileEnabled ? 'checked' : '' %>>
+                        <div>
+                            <span class="checkbox-text">Enable Turnstile</span>
+                            <p class="checkbox-description">When enabled, users must complete a CAPTCHA challenge on registration and voting pages.</p>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label for="turnstileSiteKey">Site Key</label>
+                    <input type="text" name="turnstileSiteKey" id="turnstileSiteKey" 
+                           value="<%= settings.turnstileSiteKey || '' %>"
+                           placeholder="0x4AAAAAAAA..."
+                           <%= !settings.turnstileEnabled ? 'disabled' : '' %>>
+                    <p class="field-hint">Get this from your Cloudflare Dashboard > Turnstile.</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="turnstileSecretKey">Secret Key</label>
+                    <input type="password" name="turnstileSecretKey" id="turnstileSecretKey" 
+                           value="<%= settings.turnstileSecretKey || '' %>"
+                           placeholder="0x4AAAAAAAA..."
+                           <%= !settings.turnstileEnabled ? 'disabled' : '' %>>
+                    <p class="field-hint">Keep this secret. Used for server-side verification.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i data-lucide="save" style="width: 18px; height: 18px;"></i>
+                    Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/public/js/admin.js"></script>
+<script>
+(function() {
+    function toggleFields(checkboxId, fieldIds) {
+        const checkbox = document.getElementById(checkboxId);
+        if (!checkbox) return;
+        
+        function updateFields() {
+            const enabled = checkbox.checked;
+            fieldIds.forEach(id => {
+                const field = document.getElementById(id);
+                if (field) {
+                    field.disabled = !enabled;
+                    const formGroup = field.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.toggle('disabled', !enabled);
+                    }
+                }
+            });
+        }
+        
+        checkbox.addEventListener('change', updateFields);
+        updateFields();
+    }
+    
+    toggleFields('bannerEnabled', ['bannerType', 'bannerMessage']);
+    toggleFields('maintenanceMode', ['maintenanceMessage']);
+    toggleFields('turnstileEnabled', ['turnstileSiteKey', 'turnstileSecretKey']);
+    
+    // Guest voting requires auto-approval
+    const guestVotingCheckbox = document.getElementById('guestVotingEnabled');
+    const autoApprovalCheckbox = document.getElementById('autoApprovalEnabled');
+    
+    if (guestVotingCheckbox && autoApprovalCheckbox) {
+        function updateGuestVotingDependency() {
+            if (guestVotingCheckbox.checked && !autoApprovalCheckbox.checked) {
+                autoApprovalCheckbox.checked = true;
+            }
+            // When guest voting is enabled, auto-approval cannot be unchecked
+            if (guestVotingCheckbox.checked) {
+                autoApprovalCheckbox.disabled = true;
+                const formGroup = autoApprovalCheckbox.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.add('disabled');
+                }
+            } else {
+                autoApprovalCheckbox.disabled = false;
+                const formGroup = autoApprovalCheckbox.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.remove('disabled');
+                }
+            }
+        }
+        
+        guestVotingCheckbox.addEventListener('change', updateGuestVotingDependency);
+        updateGuestVotingDependency();
+    }
+})();
+</script>
+
+<%- include('../partials/footer') %>

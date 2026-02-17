@@ -1,0 +1,98 @@
+<%- include('../partials/header') %>
+<%- include('../partials/election-type-helper') %>
+
+<div class="results">
+    <h1><%= title %></h1>
+    
+    <div class="election-info">
+        <p><strong>Election Type:</strong> <%- formatElectionType(election.electionType) %></p>
+        <p><strong>Total Votes:</strong> <%= totalVotes %></p>
+    </div>
+    
+    <% const hasTie = results.some(r => r.isTied); %>
+    <% if (hasTie && !tieResolution) { %>
+        <div class="alert alert-warning">
+            <i data-lucide="alert-triangle" class="icon-md"></i>
+            <div>
+                <strong>Tie Detected</strong>
+                <p>Multiple candidates have the same number of votes. Administrator intervention is required to resolve this election.</p>
+                <% if (locals.isAdmin) { %>
+                    <p style="margin-top: 0.5rem;">
+                        <a href="/admin/elections/<%= election.electionID %>" class="btn btn-sm btn-warning">
+                            <i data-lucide="settings" class="icon-sm"></i>
+                            Resolve Tie
+                        </a>
+                    </p>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+    
+    <% if (tieResolution) { %>
+        <div class="alert alert-success">
+            <i data-lucide="check-circle" class="icon-md"></i>
+            <div>
+                <strong>Election Resolved</strong>
+                <p>
+                    <% if (tieResolution.resolutionType === 'RANDOM') { %>
+                        A tie was resolved by random selection.
+                    <% } else if (tieResolution.resolutionType === 'MANUAL') { %>
+                        A tie was resolved by administrator decision.
+                    <% } else if (tieResolution.resolutionType === 'RECALL') { %>
+                        This election has been marked for a recall ballot.
+                    <% } %>
+                </p>
+            </div>
+        </div>
+    <% } %>
+    
+    <h2>Results</h2>
+    <div class="results-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Votes</th>
+                    <th>Percentage</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% results.forEach(result => { 
+                    const isResolvedWinner = tieResolution && tieResolution.winnerCandidateID === result.candidateID;
+                    const showTiedStyle = result.isTied && !tieResolution;
+                    const rowClass = isResolvedWinner ? 'winner' : (result.isWinner ? 'winner' : (showTiedStyle ? 'tied' : ''));
+                %>
+                    <tr class="<%= rowClass %>">
+                        <td><%= result.candidateName %></td>
+                        <td><%= result.votes %></td>
+                        <td><%= result.percentage.toFixed(2) %>%</td>
+                        <td>
+                            <% if (isResolvedWinner) { %>
+                                <span class="status-badge winner-badge">
+                                    <i data-lucide="trophy" class="icon-sm"></i> Winner
+                                </span>
+                            <% } else if (result.isWinner) { %>
+                                <span class="status-badge winner-badge">
+                                    <i data-lucide="trophy" class="icon-sm"></i> Winner
+                                </span>
+                            <% } else if (result.isTied && !tieResolution) { %>
+                                <span class="status-badge tied-badge">
+                                    <i data-lucide="alert-circle" class="icon-sm"></i> Tied
+                                </span>
+                            <% } else if (tieResolution && tieResolution.resolutionType === 'RECALL' && result.isTied) { %>
+                                <span class="status-badge tied-badge">
+                                    <i data-lucide="refresh-cw" class="icon-sm"></i> Recall
+                                </span>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+    
+    <a href="/elections" class="btn btn-secondary">Back to Elections</a>
+</div>
+
+<%- include('../partials/footer') %>

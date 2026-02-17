@@ -1,0 +1,78 @@
+<%- include('../partials/header') %>
+
+<div class="admin-dashboard">
+    <%- include('../partials/admin-sidebar', { activePage: 'dashboard' }) %>
+    
+    <div class="admin-content">
+        <div class="admin-header">
+            <div class="admin-header-info">
+                <h1>Dashboard Overview</h1>
+                <p>System status and quick statistics</p>
+            </div>
+        </div>
+        
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="vote" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><%= stats.totalElections || 0 %></h3>
+                    <p>Total Elections</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><%= stats.activeElections || 0 %></h3>
+                    <p>Active Elections</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="users" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><%= stats.totalVoters || 0 %></h3>
+                    <p>Registered Voters</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="file-check" style="width: 24px; height: 24px;"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><%= stats.totalVotes || 0 %></h3>
+                    <p>Votes Cast</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="admin-section">
+            <div class="section-header">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="quick-actions">
+                <a href="/admin/elections" class="btn btn-primary">
+                    <i data-lucide="plus" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+                    View Elections
+                </a>
+                <a href="/admin/voters" class="btn btn-secondary">
+                    <i data-lucide="users" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+                    Manage Voters
+                </a>
+                <a href="/admin/results" class="btn btn-secondary">
+                    <i data-lucide="bar-chart" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+                    View Results
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+
+<div class="kiosk-container">
+    <div class="kiosk-card" style="text-align: center;">
+        <div class="kiosk-header">
+            <div class="kiosk-icon" style="color: var(--success);">
+                <i data-lucide="check-circle" style="width: 64px; height: 64px;"></i>
+            </div>
+            <h1>Registration Successful!</h1>
+            <p>Welcome to Consensus, <%= voter.name %>!</p>
+        </div>
+        
+        <div class="alert alert-info" style="text-align: left; margin: 1.5rem 2rem;">
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                <i data-lucide="info" style="width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px;"></i>
+                <div>
+                    <p style="margin: 0 0 0.5rem 0;"><strong>Status:</strong> <%= voter.registrationStatus %></p>
+                    <p style="margin: 0;">Your registration is pending approval. You will be able to vote once an administrator approves your registration.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding: 0 2rem 2rem; display: flex; flex-direction: column; gap: 1rem;">
+            <a href="/dashboard" class="kiosk-btn kiosk-btn-primary">
+                <i data-lucide="layout-dashboard" style="width: 20px; height: 20px;"></i>
+                Go to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

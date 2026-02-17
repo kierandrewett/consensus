@@ -1,0 +1,37 @@
+<%- include('../partials/dashboard-header', { activeTab: 'history' }) %>
+
+<% if (confirmations.length === 0) { %>
+        <div class="empty-message">
+            <i data-lucide="inbox" style="width: 32px; height: 32px;"></i>
+            <p>You haven't voted in any elections yet</p>
+            <a href="/elections" class="btn btn-primary" style="margin-top: 1rem;">View Elections</a>
+        </div>
+    <% } else { %>
+        <div class="history-list">
+            <% confirmations.forEach(conf => { %>
+                <div class="history-item">
+                    <div class="history-icon">
+                        <i data-lucide="check" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <div class="history-info">
+                        <h3><%= conf.electionName %></h3>
+                        <p>Voted on <%= conf.confirmedAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %> at <%= conf.confirmedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) %></p>
+                    </div>
+                    <div class="history-id">
+                        <code><%= conf.confirmationID.slice(-8) %></code>
+                    </div>
+                    <a href="/receipt/<%= conf.confirmationID %>" target="_blank" class="btn btn-sm btn-secondary">
+                        <i data-lucide="printer" style="width: 14px; height: 14px;"></i>
+                        Receipt
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+        
+        <div class="privacy-note">
+            <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+            <p>These confirmations prove you voted but don't reveal your choices. Your ballot is anonymous.</p>
+        </div>
+    <% } %>
+
+<%- include('../partials/dashboard-footer') %>
