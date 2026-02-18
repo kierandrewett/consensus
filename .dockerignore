@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.gitignore
+*.db
+*.log
+.env*
+.yarn
+.editorconfig
+coverage
+jest.config.cjs
+jest.e2e.config.cjs
+*.md
