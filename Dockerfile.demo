@@ -1,0 +1,20 @@
+# Demo deployment - resets database daily
+# Build the base image first: docker build -t consensus .
+# Then build this: docker build -f Dockerfile.demo -t consensus-demo .
+
+FROM consensus:latest
+
+USER root
+
+# Copy entrypoint script
+COPY --chown=nodejs:nodejs demo-entrypoint.sh /app/demo-entrypoint.sh
+RUN chmod +x /app/demo-entrypoint.sh
+
+# Demo environment variables
+ENV DEMO_MODE=true
+ENV DB_RESET_INTERVAL_SECONDS=86400
+
+USER nodejs
+
+# Start with the demo entrypoint
+CMD ["/app/demo-entrypoint.sh"]
