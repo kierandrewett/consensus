@@ -86,6 +86,10 @@ export async function clearCookies(page: Page): Promise<void> {
     await client.send('Network.clearBrowserCookies');
 }
 
+// Track admin password state (changes after first forced password change)
+let adminPassword = 'admin123';
+const CHANGED_ADMIN_PASSWORD = 'NewAdmin123!';
+
 /**
  * Helper: Login as admin
  */
@@ -94,26 +98,39 @@ export async function loginAsAdmin(ctx: E2EContext): Promise<void> {
     await clearCookies(ctx.page);
     
     // Navigate to login page and wait for it to fully load
-    await ctx.page.goto(`${ctx.baseUrl}/admin/login`, { timeout: 15000, waitUntil: 'domcontentloaded' });
-    
-    // Wait a moment for the page to settle
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await ctx.page.goto(`${ctx.baseUrl}/admin/login`, { timeout: 15000, waitUntil: 'networkidle0' });
     
     // Wait for the form to be present
     await ctx.page.waitForSelector('input[name="username"]', { visible: true, timeout: 10000 });
     
     await ctx.page.type('input[name="username"]', 'admin');
-    await ctx.page.type('input[name="password"]', 'admin123');
+    await ctx.page.type('input[name="password"]', adminPassword);
     await Promise.all([
         ctx.page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }),
         ctx.page.click('button[type="submit"]')
     ]);
+    
+    // Handle forced password change if required
+    if (ctx.page.url().includes('/admin/change-password')) {
+        await ctx.page.waitForSelector('input[name="password"]', { visible: true, timeout: 5000 });
+        await ctx.page.type('input[name="password"]', CHANGED_ADMIN_PASSWORD);
+        await ctx.page.type('input[name="confirmPassword"]', CHANGED_ADMIN_PASSWORD);
+        await Promise.all([
+            ctx.page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 15000 }),
+            ctx.page.click('button[type="submit"]')
+        ]);
+        // Update the password for subsequent logins
+        adminPassword = CHANGED_ADMIN_PASSWORD;
+    }
 }
 
 /**
  * Helper: Login as voter
  */
 export async function loginAsVoter(ctx: E2EContext, email = 'alice@example.com', password = 'password123'): Promise<void> {
+    // Clear any existing session state
+    await clearCookies(ctx.page);
+    
     await ctx.page.goto(`${ctx.baseUrl}/login`, { timeout: 10000 });
     await ctx.page.waitForSelector('input[name="email"]', { timeout: 5000 });
     await ctx.page.type('input[name="email"]', email);

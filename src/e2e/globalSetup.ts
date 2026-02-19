@@ -92,6 +92,31 @@ export default async function globalSetup() {
     // Small delay to ensure port is freed
     await new Promise(resolve => setTimeout(resolve, 500));
     
+    // Reset and seed the database before starting the server
+    console.log('[E2E Setup] Resetting database...');
+    try {
+        execSync('node dist/seed.js --reset', { 
+            cwd: process.cwd(),
+            stdio: 'inherit',
+            env: { ...process.env, NODE_ENV: 'test' }
+        });
+    } catch (error) {
+        // Reset may fail if DB doesn't exist, that's OK
+    }
+    
+    console.log('[E2E Setup] Seeding database...');
+    try {
+        execSync('node dist/seed.js', { 
+            cwd: process.cwd(),
+            stdio: 'inherit',
+            env: { ...process.env, NODE_ENV: 'test' }
+        });
+        console.log('[E2E Setup] Database seeded successfully');
+    } catch (error) {
+        console.error('[E2E Setup] Failed to seed database:', error);
+        throw new Error('E2E Setup failed: Could not seed database');
+    }
+    
     // Start server with explicit test environment
     const serverEnv = { 
         ...process.env, 
@@ -105,12 +130,11 @@ export default async function globalSetup() {
     serverProcess = spawn('node', ['dist/index.js'], {
         cwd: process.cwd(),
         env: serverEnv,
-        stdio: ['pipe', 'pipe', 'pipe'], // Capture all output to detect errors
+        stdio: ['pipe', 'ignore', 'pipe'], // stdin, stdout (ignored), stderr
         detached: true,
     });
     
-    // Pipe server output to console for visibility
-    serverProcess.stdout?.on('data', (data) => process.stdout.write(data));
+    // Pipe server errors to console
     serverProcess.stderr?.on('data', (data) => process.stderr.write(data));
 
     const baseUrl = `http://127.0.0.1:${TEST_PORT}`;
