@@ -9,6 +9,8 @@
 }
 
 .receipt-page .receipt-header {
+    display: flex;
+    flex-direction: column;
     text-align: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
@@ -105,6 +107,8 @@
 }
 
 .receipt-page .privacy-note {
+    display: flex;
+    flex-direction: column;
     background: #f0fdf4;
     border: 1px solid #86efac;
     border-radius: 6px;
