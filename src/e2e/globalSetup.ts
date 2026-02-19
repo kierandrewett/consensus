@@ -128,9 +128,9 @@ export default async function globalSetup() {
 
     // Launch browser
     browser = await puppeteer.launch({
-        headless: false,
+        headless: !!process.env.CI,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        slowMo: 50 // Slow down actions by 50ms so you can see what's happening
+        slowMo: process.env.CI ? 0 : 50
     });
 
     // Store references globally
