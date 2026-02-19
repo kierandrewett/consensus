@@ -1,10 +1,10 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { ElectionService, ElectionCreationDTO } from '../../services/ElectionService';
-import { VotingService } from '../../services/VotingService';
-import { TieResolutionRepository, TieResolution } from '../../repositories/TieResolutionRepository';
-import { ElectionType } from '../../domain/enums';
-import { v4 as uuidv4 } from 'uuid';
-import { randomInt } from 'crypto';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { ElectionService, ElectionCreationDTO } from "../../services/ElectionService";
+import { VotingService } from "../../services/VotingService";
+import { TieResolutionRepository, TieResolution } from "../../repositories/TieResolutionRepository";
+import { ElectionType } from "../../domain/enums";
+import { v4 as uuidv4 } from "uuid";
+import { randomInt } from "crypto";
 
 export interface ElectionCreationRequest {
     name: string;
@@ -39,15 +39,15 @@ export class AdminElectionController {
      * Show elections management page
      */
     async showElections(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const elections = this.electionService.getAllElections();
 
-        return reply.view('admin/elections.ejs', {
-            title: 'Manage Elections',
-            elections
+        return reply.view("admin/elections.ejs", {
+            title: "Manage Elections",
+            elections,
         });
     }
 
@@ -55,13 +55,13 @@ export class AdminElectionController {
      * Show single election details
      */
     async showElection(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const election = this.electionService.getElectionById(request.params.id);
         if (!election) {
-            return reply.status(404).send('Election not found');
+            return reply.status(404).send("Election not found");
         }
 
         const voteCount = this.votingService.getVoteCount(election.electionID);
@@ -71,20 +71,20 @@ export class AdminElectionController {
         let tieResolution = null;
         let hasTie = false;
 
-        if (election.status === 'CLOSED') {
+        if (election.status === "CLOSED") {
             results = this.votingService.calculateResults(election.electionID);
             tieResolution = this.tieResolutionRepository.findByElectionId(election.electionID);
-            hasTie = results.some(r => r.isTied);
+            hasTie = results.some((r) => r.isTied);
         }
 
-        return reply.view('admin/election-detail.ejs', {
+        return reply.view("admin/election-detail.ejs", {
             title: `Election: ${election.name}`,
             election,
             candidates,
             voteCount,
             results,
             tieResolution,
-            hasTie
+            hasTie,
         });
     }
 
@@ -92,20 +92,20 @@ export class AdminElectionController {
      * Show results page
      */
     async showResults(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const elections = this.electionService.getAllElections();
 
-        const enrichedElections = elections.map(election => {
+        const enrichedElections = elections.map((election) => {
             const voteCount = this.votingService.getVoteCount(election.electionID);
             let winner = null;
             let results = null;
             let hasTie = false;
             let resolutionType: string | null = null;
 
-            if (election.status === 'CLOSED') {
+            if (election.status === "CLOSED") {
                 results = this.votingService.calculateResults(election.electionID);
                 const tieResolution = this.tieResolutionRepository.findByElectionId(election.electionID);
 
@@ -138,13 +138,13 @@ export class AdminElectionController {
                 winner,
                 hasTie,
                 resolutionType,
-                topResults: results ? results.slice(0, 3) : null
+                topResults: results ? results.slice(0, 3) : null,
             };
         });
 
-        return reply.view('admin/results.ejs', {
-            title: 'Election Results',
-            elections: enrichedElections
+        return reply.view("admin/results.ejs", {
+            title: "Election Results",
+            elections: enrichedElections,
         });
     }
 
@@ -155,8 +155,8 @@ export class AdminElectionController {
         request: FastifyRequest<{ Body: ElectionCreationRequest }>,
         reply: FastifyReply
     ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         const { name, electionType, startDate, endDate, description } = request.body;
@@ -164,7 +164,7 @@ export class AdminElectionController {
         try {
             const validTypes = Object.values(ElectionType);
             if (!validTypes.includes(electionType as ElectionType)) {
-                throw new Error(`Invalid election type. Must be one of: ${validTypes.join(', ')}`);
+                throw new Error(`Invalid election type. Must be one of: ${validTypes.join(", ")}`);
             }
 
             const dto: ElectionCreationDTO = {
@@ -172,17 +172,17 @@ export class AdminElectionController {
                 electionType: electionType as ElectionType,
                 startDate: new Date(startDate),
                 endDate: new Date(endDate),
-                description
+                description,
             };
 
             const election = this.electionService.createElection(dto);
 
             return reply.redirect(`/admin/elections/${election.electionID}`);
         } catch (error: any) {
-            return reply.status(400).view('admin/elections.ejs', {
-                title: 'Manage Elections',
+            return reply.status(400).view("admin/elections.ejs", {
+                title: "Manage Elections",
                 elections: this.electionService.getAllElections(),
-                error: error.message
+                error: error.message,
             });
         }
     }
@@ -191,8 +191,8 @@ export class AdminElectionController {
      * Close election early
      */
     async closeElection(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         try {
@@ -207,13 +207,13 @@ export class AdminElectionController {
      * Delete election
      */
     async deleteElection(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         try {
             this.electionService.deleteElection(request.params.id);
-            return reply.redirect('/admin/elections');
+            return reply.redirect("/admin/elections");
         } catch (error: any) {
             return reply.status(400).send({ error: error.message });
         }
@@ -222,12 +222,9 @@ export class AdminElectionController {
     /**
      * Activate election
      */
-    async activateElection(
-        request: FastifyRequest<{ Params: { id: string } }>,
-        reply: FastifyReply
-    ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+    async activateElection(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         try {
@@ -248,8 +245,8 @@ export class AdminElectionController {
         }>,
         reply: FastifyReply
     ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         const electionID = request.params.id;
@@ -272,8 +269,8 @@ export class AdminElectionController {
         }>,
         reply: FastifyReply
     ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         const { electionId, candidateId } = request.params;
@@ -293,68 +290,68 @@ export class AdminElectionController {
         request: FastifyRequest<{
             Params: { id: string };
             Body: {
-                resolutionType: 'RANDOM' | 'MANUAL' | 'RECALL';
+                resolutionType: "RANDOM" | "MANUAL" | "RECALL";
                 selectedCandidate?: string;
                 notes?: string;
             };
         }>,
         reply: FastifyReply
     ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         const electionID = request.params.id;
         const { resolutionType, selectedCandidate, notes } = request.body;
-        const adminID = request.session.get('adminID') as string;
+        const adminID = request.session.get("adminID") as string;
 
         try {
             const election = this.electionService.getElectionById(electionID);
             if (!election) {
-                return reply.status(404).send({ error: 'Election not found' });
+                return reply.status(404).send({ error: "Election not found" });
             }
 
-            if (election.status !== 'CLOSED') {
-                return reply.status(400).send({ error: 'Election must be closed to resolve ties' });
+            if (election.status !== "CLOSED") {
+                return reply.status(400).send({ error: "Election must be closed to resolve ties" });
             }
 
             const results = this.votingService.calculateResults(electionID);
-            const tiedCandidates = results.filter(r => r.isTied);
+            const tiedCandidates = results.filter((r) => r.isTied);
 
             if (tiedCandidates.length === 0) {
-                return reply.status(400).send({ error: 'No tie to resolve in this election' });
+                return reply.status(400).send({ error: "No tie to resolve in this election" });
             }
 
             const existingResolution = this.tieResolutionRepository.findByElectionId(electionID);
             if (existingResolution) {
-                return reply.status(400).send({ error: 'Tie has already been resolved' });
+                return reply.status(400).send({ error: "Tie has already been resolved" });
             }
 
             let winnerCandidateID: string | null = null;
 
             switch (resolutionType) {
-                case 'RANDOM':
+                case "RANDOM":
                     const randomIndex = randomInt(tiedCandidates.length);
                     winnerCandidateID = tiedCandidates[randomIndex].candidateID;
                     break;
 
-                case 'MANUAL':
+                case "MANUAL":
                     if (!selectedCandidate) {
-                        return reply.status(400).send({ error: 'Manual resolution requires selecting a candidate' });
+                        return reply.status(400).send({ error: "Manual resolution requires selecting a candidate" });
                     }
-                    const isValidSelection = tiedCandidates.some(c => c.candidateID === selectedCandidate);
+                    const isValidSelection = tiedCandidates.some((c) => c.candidateID === selectedCandidate);
                     if (!isValidSelection) {
-                        return reply.status(400).send({ error: 'Selected candidate is not among the tied candidates' });
+                        return reply.status(400).send({ error: "Selected candidate is not among the tied candidates" });
                     }
                     winnerCandidateID = selectedCandidate;
                     break;
 
-                case 'RECALL':
+                case "RECALL":
                     winnerCandidateID = null;
                     break;
 
                 default:
-                    return reply.status(400).send({ error: 'Invalid resolution type' });
+                    return reply.status(400).send({ error: "Invalid resolution type" });
             }
 
             const resolution: TieResolution = {
@@ -364,7 +361,7 @@ export class AdminElectionController {
                 winnerCandidateID,
                 resolvedBy: adminID,
                 resolvedAt: new Date(),
-                notes: notes || null
+                notes: notes || null,
             };
 
             this.tieResolutionRepository.save(resolution);

@@ -1,5 +1,5 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { SettingsRepository } from '../../repositories/SettingsRepository';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { SettingsRepository } from "../../repositories/SettingsRepository";
 
 export class AdminSettingsController {
     constructor(private settingsRepository: SettingsRepository) {}
@@ -16,18 +16,18 @@ export class AdminSettingsController {
      * Show management settings page
      */
     async showManagement(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const settings = this.settingsRepository.getAll();
-        const successMessage = request.session.get('managementSuccess');
-        request.session.set('managementSuccess', undefined);
+        const successMessage = request.session.get("managementSuccess");
+        request.session.set("managementSuccess", undefined);
 
-        return reply.view('admin/management.ejs', {
-            title: 'System Management',
+        return reply.view("admin/management.ejs", {
+            title: "System Management",
             settings,
-            success: successMessage
+            success: successMessage,
         });
     }
 
@@ -53,32 +53,32 @@ export class AdminSettingsController {
         }>,
         reply: FastifyReply
     ): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const body = request.body;
 
         // If guest voting is enabled, auto-approval must be enabled
-        const guestVotingEnabled = body.guestVotingEnabled === 'on';
-        const autoApprovalEnabled = guestVotingEnabled || body.autoApprovalEnabled === 'on';
+        const guestVotingEnabled = body.guestVotingEnabled === "on";
+        const autoApprovalEnabled = guestVotingEnabled || body.autoApprovalEnabled === "on";
 
         this.settingsRepository.updateAll({
-            bannerEnabled: body.bannerEnabled === 'on',
-            bannerMessage: body.bannerMessage || '',
-            bannerType: (body.bannerType as 'info' | 'warning' | 'error') || 'info',
-            signupEnabled: body.signupEnabled === 'on',
-            loginEnabled: body.loginEnabled === 'on',
-            maintenanceMode: body.maintenanceMode === 'on',
-            maintenanceMessage: body.maintenanceMessage || '',
+            bannerEnabled: body.bannerEnabled === "on",
+            bannerMessage: body.bannerMessage || "",
+            bannerType: (body.bannerType as "info" | "warning" | "error") || "info",
+            signupEnabled: body.signupEnabled === "on",
+            loginEnabled: body.loginEnabled === "on",
+            maintenanceMode: body.maintenanceMode === "on",
+            maintenanceMessage: body.maintenanceMessage || "",
             guestVotingEnabled,
             autoApprovalEnabled,
-            turnstileEnabled: body.turnstileEnabled === 'on',
-            turnstileSiteKey: body.turnstileSiteKey || '',
-            turnstileSecretKey: body.turnstileSecretKey || ''
+            turnstileEnabled: body.turnstileEnabled === "on",
+            turnstileSiteKey: body.turnstileSiteKey || "",
+            turnstileSecretKey: body.turnstileSecretKey || "",
         });
 
-        request.session.set('managementSuccess', 'Settings updated successfully');
-        return reply.redirect('/admin/management');
+        request.session.set("managementSuccess", "Settings updated successfully");
+        return reply.redirect("/admin/management");
     }
 }

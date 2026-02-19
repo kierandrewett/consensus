@@ -1,5 +1,5 @@
-import { Ballot } from '../../domain/entities/Ballot';
-import { Candidate } from '../../domain/entities/Candidate';
+import { Ballot } from "../../domain/entities/Ballot";
+import { Candidate } from "../../domain/entities/Candidate";
 
 export interface VoteResult {
     candidateID: string;
@@ -7,7 +7,7 @@ export interface VoteResult {
     votes: number;
     percentage: number;
     isWinner: boolean;
-    isTied?: boolean;  // True when multiple candidates have the same top votes
+    isTied?: boolean; // True when multiple candidates have the same top votes
 }
 
 export interface IVotingStrategy {

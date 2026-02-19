@@ -1,6 +1,6 @@
-import Database from 'better-sqlite3';
-import { VoteConfirmation } from '../domain/entities/VoteConfirmation';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { VoteConfirmation } from "../domain/entities/VoteConfirmation";
+import { DatabaseConnection } from "../db/connection";
 
 export interface IVoteConfirmationRepository {
     save(confirmation: VoteConfirmation): void;
@@ -44,15 +44,10 @@ export class VoteConfirmationRepository implements IVoteConfirmationRepository {
         `);
 
         const rows = stmt.all(voterID) as any[];
-        return rows.map(row => this.mapRowToConfirmation(row));
+        return rows.map((row) => this.mapRowToConfirmation(row));
     }
 
     private mapRowToConfirmation(row: any): VoteConfirmation {
-        return new VoteConfirmation(
-            row.confirmation_id,
-            row.voter_id,
-            row.election_id,
-            new Date(row.confirmed_at)
-        );
+        return new VoteConfirmation(row.confirmation_id, row.voter_id, row.election_id, new Date(row.confirmed_at));
     }
 }

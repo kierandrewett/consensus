@@ -1,6 +1,6 @@
-import { E2EContext, setupE2E, teardownE2E, clearCookies, loginAsAdmin } from './setup';
+import { E2EContext, setupE2E, teardownE2E, clearCookies, loginAsAdmin } from "./setup";
 
-describe('E2E: Election Results', () => {
+describe("E2E: Election Results", () => {
     let ctx: E2EContext;
 
     beforeAll(async () => {
@@ -15,8 +15,8 @@ describe('E2E: Election Results', () => {
         await clearCookies(ctx.page);
     });
 
-    describe('Public Results', () => {
-        it('should show results for closed elections', async () => {
+    describe("Public Results", () => {
+        it("should show results for closed elections", async () => {
             await ctx.page.goto(`${ctx.baseUrl}/results`);
 
             const pageContent = await ctx.page.content();
@@ -24,16 +24,16 @@ describe('E2E: Election Results', () => {
         });
     });
 
-    describe('Admin Results', () => {
+    describe("Admin Results", () => {
         beforeEach(async () => {
             await loginAsAdmin(ctx);
         });
 
-        it('should display admin results page', async () => {
+        it("should display admin results page", async () => {
             await ctx.page.goto(`${ctx.baseUrl}/admin/results`);
 
-            const heading = await ctx.page.$eval('h1', el => el.textContent);
-            expect(heading?.toLowerCase()).toContain('result');
+            const heading = await ctx.page.$eval("h1", (el) => el.textContent);
+            expect(heading?.toLowerCase()).toContain("result");
         });
     });
 });

@@ -1,18 +1,18 @@
-import { Voter } from '../domain/entities/Voter';
-import { VoteConfirmation } from '../domain/entities/VoteConfirmation';
-import { RegistrationStatus, ElectionStatus } from '../domain/enums';
-import { IBallotRepository } from '../repositories/interfaces/IBallotRepository';
-import { IVoterEligibilityRepository } from '../repositories/interfaces/IVoterEligibilityRepository';
-import { IVoteConfirmationRepository } from '../repositories/VoteConfirmationRepository';
-import { IElectionRepository } from '../repositories/interfaces/IElectionRepository';
-import { ICandidateRepository } from '../repositories/interfaces/ICandidateRepository';
-import { BallotFactory } from './factories/BallotFactory';
-import { AnonymousBallotAdapter, VoteInput } from './adapters/AnonymousBallotAdapter';
-import { IVotingStrategy, VoteResult } from './strategies/IVotingStrategy';
-import { FPTPStrategy } from './strategies/FPTPStrategy';
-import { STVStrategy } from './strategies/STVStrategy';
-import { AVStrategy } from './strategies/AVStrategy';
-import { ElectionType } from '../domain/enums';
+import { Voter } from "../domain/entities/Voter";
+import { VoteConfirmation } from "../domain/entities/VoteConfirmation";
+import { RegistrationStatus, ElectionStatus } from "../domain/enums";
+import { IBallotRepository } from "../repositories/interfaces/IBallotRepository";
+import { IVoterEligibilityRepository } from "../repositories/interfaces/IVoterEligibilityRepository";
+import { IVoteConfirmationRepository } from "../repositories/VoteConfirmationRepository";
+import { IElectionRepository } from "../repositories/interfaces/IElectionRepository";
+import { ICandidateRepository } from "../repositories/interfaces/ICandidateRepository";
+import { BallotFactory } from "./factories/BallotFactory";
+import { AnonymousBallotAdapter, VoteInput } from "./adapters/AnonymousBallotAdapter";
+import { IVotingStrategy, VoteResult } from "./strategies/IVotingStrategy";
+import { FPTPStrategy } from "./strategies/FPTPStrategy";
+import { STVStrategy } from "./strategies/STVStrategy";
+import { AVStrategy } from "./strategies/AVStrategy";
+import { ElectionType } from "../domain/enums";
 
 export interface CastVoteDTO {
     voterID: string;
@@ -49,37 +49,37 @@ export class VotingService {
     castVote(voter: Voter, dto: CastVoteDTO): VoteConfirmation {
         // Validate voter is approved
         if (voter.registrationStatus !== RegistrationStatus.APPROVED) {
-            throw new Error('Voter is not approved');
+            throw new Error("Voter is not approved");
         }
 
         // Get election
         const election = this.electionRepository.findById(dto.electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         // Validate election is active
         if (election.status !== ElectionStatus.ACTIVE) {
-            throw new Error('Election is not active');
+            throw new Error("Election is not active");
         }
 
         // Check election dates
         const now = new Date();
         if (now < election.startDate || now > election.endDate) {
-            throw new Error('Election is not currently open for voting');
+            throw new Error("Election is not currently open for voting");
         }
 
         // Check voter hasn't already voted
         if (this.eligibilityRepository.hasVoted(dto.voterID, dto.electionID)) {
-            throw new Error('Voter has already voted in this election');
+            throw new Error("Voter has already voted in this election");
         }
 
         // Validate candidate(s) exist in this election
         const candidates = this.candidateRepository.findByElectionId(dto.electionID);
-        const candidateIDs = new Set(candidates.map(c => c.candidateID));
+        const candidateIDs = new Set(candidates.map((c) => c.candidateID));
 
         if (dto.candidateID && !candidateIDs.has(dto.candidateID)) {
-            throw new Error('Invalid candidate ID');
+            throw new Error("Invalid candidate ID");
         }
 
         if (dto.preferences) {
@@ -103,21 +103,21 @@ export class VotingService {
         }
 
         if (!strategy.validateBallot(ballot, candidates.length)) {
-            throw new Error('Invalid ballot: Please ensure each candidate has a unique ranking with no duplicates.');
+            throw new Error("Invalid ballot: Please ensure each candidate has a unique ranking with no duplicates.");
         }
 
         const voteInput: VoteInput = {
             voter,
             electionID: dto.electionID,
             candidateID: dto.candidateID,
-            preferences: dto.preferences
+            preferences: dto.preferences,
         };
 
         const { ballot: anonymousBallot, confirmation } = this.anonymousAdapter.adapt(voteInput);
 
         // Verify ballot is truly anonymous
         if (!this.anonymousAdapter.verifyAnonymity(anonymousBallot)) {
-            throw new Error('Ballot anonymity verification failed');
+            throw new Error("Ballot anonymity verification failed");
         }
 
         // Store anonymous ballot (no link to voter)
@@ -157,12 +157,12 @@ export class VotingService {
     calculateResults(electionID: string): VoteResult[] {
         const election = this.electionRepository.findById(electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         // Election must be closed to view results
         if (election.status !== ElectionStatus.CLOSED) {
-            throw new Error('Results only available for closed elections');
+            throw new Error("Results only available for closed elections");
         }
 
         // Get ballots and candidates

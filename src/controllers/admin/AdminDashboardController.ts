@@ -1,7 +1,7 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { ElectionService } from '../../services/ElectionService';
-import { VoterService } from '../../services/VoterService';
-import { VotingService } from '../../services/VotingService';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { ElectionService } from "../../services/ElectionService";
+import { VoterService } from "../../services/VoterService";
+import { VotingService } from "../../services/VotingService";
 
 export class AdminDashboardController {
     constructor(
@@ -22,16 +22,16 @@ export class AdminDashboardController {
      * Show admin dashboard
      */
     async showDashboard(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const elections = this.electionService.getAllElections();
-        const activeElections = elections.filter(e => e.status === 'ACTIVE');
+        const activeElections = elections.filter((e) => e.status === "ACTIVE");
         const voters = this.voterService.getAllVoters();
 
         let totalVotes = 0;
-        elections.forEach(election => {
+        elections.forEach((election) => {
             totalVotes += this.votingService.getVoteCount(election.electionID);
         });
 
@@ -39,12 +39,12 @@ export class AdminDashboardController {
             totalElections: elections.length,
             activeElections: activeElections.length,
             totalVoters: voters.length,
-            totalVotes: totalVotes
+            totalVotes: totalVotes,
         };
 
-        return reply.view('admin/dashboard.ejs', {
-            title: 'Admin Dashboard',
-            stats
+        return reply.view("admin/dashboard.ejs", {
+            title: "Admin Dashboard",
+            stats,
         });
     }
 }

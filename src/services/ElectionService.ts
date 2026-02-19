@@ -1,9 +1,9 @@
-import { randomUUID } from 'crypto';
-import { Election } from '../domain/entities/Election';
-import { Candidate } from '../domain/entities/Candidate';
-import { ElectionType, ElectionStatus } from '../domain/enums';
-import { IElectionRepository } from '../repositories/interfaces/IElectionRepository';
-import { ICandidateRepository } from '../repositories/interfaces/ICandidateRepository';
+import { randomUUID } from "crypto";
+import { Election } from "../domain/entities/Election";
+import { Candidate } from "../domain/entities/Candidate";
+import { ElectionType, ElectionStatus } from "../domain/enums";
+import { IElectionRepository } from "../repositories/interfaces/IElectionRepository";
+import { ICandidateRepository } from "../repositories/interfaces/ICandidateRepository";
 
 export interface ElectionCreationDTO {
     name: string;
@@ -31,7 +31,7 @@ export class ElectionService {
     createElection(dto: ElectionCreationDTO): Election {
         // Validate dates
         if (dto.startDate >= dto.endDate) {
-            throw new Error('End date must be after start date');
+            throw new Error("End date must be after start date");
         }
 
         // Allow any time on current date (compare dates only, not times)
@@ -39,9 +39,9 @@ export class ElectionService {
         today.setHours(0, 0, 0, 0);
         const startDay = new Date(dto.startDate);
         startDay.setHours(0, 0, 0, 0);
-        
+
         if (startDay < today) {
-            throw new Error('Start date cannot be in the past');
+            throw new Error("Start date cannot be in the past");
         }
 
         const election = new Election(
@@ -65,20 +65,14 @@ export class ElectionService {
     addCandidate(electionID: string, dto: CandidateCreationDTO): Candidate {
         const election = this.electionRepository.findById(electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         if (election.status !== ElectionStatus.DRAFT) {
-            throw new Error('Cannot add candidates to non-draft elections');
+            throw new Error("Cannot add candidates to non-draft elections");
         }
 
-        const candidate = new Candidate(
-            randomUUID(),
-            electionID,
-            dto.name,
-            dto.party,
-            dto.biography
-        );
+        const candidate = new Candidate(randomUUID(), electionID, dto.name, dto.party, dto.biography);
 
         this.candidateRepository.save(candidate);
 
@@ -91,20 +85,20 @@ export class ElectionService {
     removeCandidate(electionID: string, candidateID: string): void {
         const election = this.electionRepository.findById(electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         if (election.status !== ElectionStatus.DRAFT) {
-            throw new Error('Cannot remove candidates from non-draft elections');
+            throw new Error("Cannot remove candidates from non-draft elections");
         }
 
         const candidate = this.candidateRepository.findById(candidateID);
         if (!candidate) {
-            throw new Error('Candidate not found');
+            throw new Error("Candidate not found");
         }
 
         if (candidate.electionID !== electionID) {
-            throw new Error('Candidate does not belong to this election');
+            throw new Error("Candidate does not belong to this election");
         }
 
         this.candidateRepository.delete(candidateID);
@@ -142,9 +136,7 @@ export class ElectionService {
      * Get all closed elections
      */
     getClosedElections(): Election[] {
-        return this.electionRepository.findAll().filter(
-            election => election.status === ElectionStatus.CLOSED
-        );
+        return this.electionRepository.findAll().filter((election) => election.status === ElectionStatus.CLOSED);
     }
 
     /**
@@ -153,13 +145,13 @@ export class ElectionService {
     activateElection(electionID: string): void {
         const election = this.electionRepository.findById(electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         // Validate election has candidates
         const candidates = this.candidateRepository.findByElectionId(electionID);
         if (candidates.length < 2) {
-            throw new Error('Election must have at least 2 candidates');
+            throw new Error("Election must have at least 2 candidates");
         }
 
         election.status = ElectionStatus.ACTIVE;
@@ -172,7 +164,7 @@ export class ElectionService {
     closeElection(electionID: string): void {
         const election = this.electionRepository.findById(electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         election.status = ElectionStatus.CLOSED;
@@ -185,11 +177,11 @@ export class ElectionService {
     deleteElection(electionID: string): void {
         const election = this.electionRepository.findById(electionID);
         if (!election) {
-            throw new Error('Election not found');
+            throw new Error("Election not found");
         }
 
         if (election.status !== ElectionStatus.DRAFT) {
-            throw new Error('Only draft elections can be deleted');
+            throw new Error("Only draft elections can be deleted");
         }
 
         // Delete all candidates first

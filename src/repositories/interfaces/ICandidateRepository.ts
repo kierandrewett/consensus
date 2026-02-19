@@ -1,4 +1,4 @@
-import { Candidate } from '../../domain/entities/Candidate';
+import { Candidate } from "../../domain/entities/Candidate";
 
 export interface ICandidateRepository {
     save(candidate: Candidate): void;

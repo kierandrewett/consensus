@@ -1,6 +1,6 @@
-import { Ballot } from '../../domain/entities/Ballot';
-import { Candidate } from '../../domain/entities/Candidate';
-import { IVotingStrategy, VoteResult } from './IVotingStrategy';
+import { Ballot } from "../../domain/entities/Ballot";
+import { Candidate } from "../../domain/entities/Candidate";
+import { IVotingStrategy, VoteResult } from "./IVotingStrategy";
 
 export class STVStrategy implements IVotingStrategy {
     calculateResults(ballots: Ballot[], candidates: Candidate[]): VoteResult[] {
@@ -10,19 +10,19 @@ export class STVStrategy implements IVotingStrategy {
         const totalVotes = ballots.length;
         const quota = Math.floor(totalVotes / 2) + 1; // Droop quota for single winner
 
-        let remainingBallots = ballots.map(b => ({
+        let remainingBallots = ballots.map((b) => ({
             ballot: b,
-            currentPreference: 0
+            currentPreference: 0,
         }));
 
         const eliminated = new Set<string>();
         const voteCounts = new Map<string, number>();
 
         // Initialize vote counts
-        candidates.forEach(c => voteCounts.set(c.candidateID, 0));
+        candidates.forEach((c) => voteCounts.set(c.candidateID, 0));
 
         // Count first preferences
-        remainingBallots.forEach(rb => {
+        remainingBallots.forEach((rb) => {
             if (rb.ballot.preferences && rb.ballot.preferences.length > 0) {
                 const firstChoice = rb.ballot.preferences[0];
                 voteCounts.set(firstChoice, (voteCounts.get(firstChoice) || 0) + 1);
@@ -45,7 +45,7 @@ export class STVStrategy implements IVotingStrategy {
             eliminated.add(lowestCandidate);
 
             // Redistribute votes (simplified)
-            remainingBallots.forEach(rb => {
+            remainingBallots.forEach((rb) => {
                 if (rb.ballot.preferences && rb.ballot.preferences[rb.currentPreference] === lowestCandidate) {
                     // Move to next preference
                     rb.currentPreference++;
@@ -71,14 +71,14 @@ export class STVStrategy implements IVotingStrategy {
         }
 
         // Create results
-        const results: VoteResult[] = candidates.map(candidate => {
+        const results: VoteResult[] = candidates.map((candidate) => {
             const votes = voteCounts.get(candidate.candidateID) || 0;
             return {
                 candidateID: candidate.candidateID,
                 candidateName: candidate.name,
                 votes,
                 percentage: totalVotes > 0 ? (votes / totalVotes) * 100 : 0,
-                isWinner: candidate.candidateID === winner
+                isWinner: candidate.candidateID === winner,
             };
         });
 

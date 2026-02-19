@@ -1,27 +1,27 @@
-import Database from 'better-sqlite3';
-import envPaths from 'env-paths';
-import { readFileSync, readdirSync } from 'fs';
-import { ensureDirSync } from 'fs-extra';
-import { dirname, join } from 'path';
+import Database from "better-sqlite3";
+import envPaths from "env-paths";
+import { readFileSync, readdirSync } from "fs";
+import { ensureDirSync } from "fs-extra";
+import { dirname, join } from "path";
 
 // Allow DATA_DIR env override for Docker, otherwise use XDG paths
-const dataDir = process.env.DATA_DIR || envPaths('consensus', { suffix: "" }).data;
+const dataDir = process.env.DATA_DIR || envPaths("consensus", { suffix: "" }).data;
 
 export class DatabaseConnection {
     private static instance: Database.Database | null = null;
-    public static readonly DB_PATH = join(dataDir, 'database.sqlite');
-    private static readonly MIGRATIONS_PATH = join(__dirname, 'migrations');
+    public static readonly DB_PATH = join(dataDir, "database.sqlite");
+    private static readonly MIGRATIONS_PATH = join(__dirname, "migrations");
 
     private constructor() {}
 
     public static getInstance(): Database.Database {
         if (!DatabaseConnection.instance) {
             console.log("Loading database from:", DatabaseConnection.DB_PATH);
-            
+
             ensureDirSync(dirname(DatabaseConnection.DB_PATH));
 
             DatabaseConnection.instance = new Database(DatabaseConnection.DB_PATH);
-            DatabaseConnection.instance.pragma('foreign_keys = ON');
+            DatabaseConnection.instance.pragma("foreign_keys = ON");
         }
 
         return DatabaseConnection.instance;
@@ -42,15 +42,15 @@ export class DatabaseConnection {
         `);
 
         // Get applied migrations
-        const appliedMigrations = DatabaseConnection.instance!
-            .prepare('SELECT version FROM schema_migrations ORDER BY version')
-            .all() as { version: number }[];
-        
-        const appliedVersions = new Set(appliedMigrations.map(m => m.version));
+        const appliedMigrations = DatabaseConnection.instance!.prepare(
+            "SELECT version FROM schema_migrations ORDER BY version"
+        ).all() as { version: number }[];
+
+        const appliedVersions = new Set(appliedMigrations.map((m) => m.version));
 
         // Read and sort migration files
         const migrationFiles = readdirSync(DatabaseConnection.MIGRATIONS_PATH)
-            .filter(file => file.endsWith('.sql'))
+            .filter((file) => file.endsWith(".sql"))
             .sort();
 
         console.log(`\nDatabase Migrations:`);
@@ -58,28 +58,27 @@ export class DatabaseConnection {
 
         // Apply pending migrations
         for (const file of migrationFiles) {
-            const version = parseInt(file.split('_')[0]);
-            
+            const version = parseInt(file.split("_")[0]);
+
             if (appliedVersions.has(version)) {
                 console.log(`✓ Migration ${version}: ${file} (already applied)`);
                 continue;
             }
 
             console.log(`▶ Running migration ${version}: ${file}`);
-            
-            const migrationSQL = readFileSync(
-                join(DatabaseConnection.MIGRATIONS_PATH, file),
-                'utf-8'
-            );
+
+            const migrationSQL = readFileSync(join(DatabaseConnection.MIGRATIONS_PATH, file), "utf-8");
 
             try {
                 DatabaseConnection.instance!.exec(migrationSQL);
-                
+
                 // Record migration as applied
-                DatabaseConnection.instance!.prepare(`
+                DatabaseConnection.instance!.prepare(
+                    `
                     INSERT INTO schema_migrations (version, name, applied_at)
                     VALUES (?, ?, ?)
-                `).run(version, file, new Date().toISOString());
+                `
+                ).run(version, file, new Date().toISOString());
 
                 console.log(`✓ Migration ${version}: ${file} (completed)`);
             } catch (error) {
@@ -88,7 +87,7 @@ export class DatabaseConnection {
             }
         }
 
-        console.log('');
+        console.log("");
     }
 
     public static close(): void {
@@ -98,10 +97,10 @@ export class DatabaseConnection {
         }
     }
 
-    public static getTestInstance(path: string = ':memory:'): Database.Database {
+    public static getTestInstance(path: string = ":memory:"): Database.Database {
         const db = new Database(path);
-        db.pragma('foreign_keys = ON');
-        
+        db.pragma("foreign_keys = ON");
+
         // Run migrations for test database
         db.exec(`
             CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -112,22 +111,21 @@ export class DatabaseConnection {
         `);
 
         const migrationFiles = readdirSync(DatabaseConnection.MIGRATIONS_PATH)
-            .filter(file => file.endsWith('.sql'))
+            .filter((file) => file.endsWith(".sql"))
             .sort();
 
         for (const file of migrationFiles) {
-            const version = parseInt(file.split('_')[0]);
-            const migrationSQL = readFileSync(
-                join(DatabaseConnection.MIGRATIONS_PATH, file),
-                'utf-8'
-            );
+            const version = parseInt(file.split("_")[0]);
+            const migrationSQL = readFileSync(join(DatabaseConnection.MIGRATIONS_PATH, file), "utf-8");
             db.exec(migrationSQL);
-            db.prepare(`
+            db.prepare(
+                `
                 INSERT INTO schema_migrations (version, name, applied_at)
                 VALUES (?, ?, ?)
-            `).run(version, file, new Date().toISOString());
+            `
+            ).run(version, file, new Date().toISOString());
         }
-        
+
         return db;
         return db;
     }

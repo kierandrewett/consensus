@@ -1,4 +1,4 @@
-import { Voter } from '../../domain/entities/Voter';
+import { Voter } from "../../domain/entities/Voter";
 
 export interface IVoterRepository {
     save(voter: Voter): void;

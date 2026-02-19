@@ -1,4 +1,4 @@
-import zxcvbn from 'zxcvbn';
+import zxcvbn from "zxcvbn";
 
 export interface PasswordStrengthResult {
     isStrong: boolean;
@@ -24,21 +24,21 @@ export class ValidationUtil {
      */
     static checkPasswordStrength(password: string, userInputs?: string[]): PasswordStrengthResult {
         const result = zxcvbn(password, userInputs);
-        
+
         const isStrong = result.score >= 3;
-        
-        let feedback = '';
+
+        let feedback = "";
         if (result.feedback.warning) {
             feedback = result.feedback.warning;
         } else if (!isStrong) {
-            feedback = 'Password is too weak';
+            feedback = "Password is too weak";
         }
-        
+
         return {
             isStrong,
             score: result.score,
             feedback,
-            suggestions: result.feedback.suggestions || []
+            suggestions: result.feedback.suggestions || [],
         };
     }
 
@@ -54,11 +54,11 @@ export class ValidationUtil {
      */
     static sanitize(input: string): string {
         return input
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#x27;')
-            .replace(/\//g, '&#x2F;');
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#x27;")
+            .replace(/\//g, "&#x2F;");
     }
 
     /**

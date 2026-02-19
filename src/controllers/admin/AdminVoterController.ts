@@ -1,5 +1,5 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { VoterService } from '../../services/VoterService';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { VoterService } from "../../services/VoterService";
 
 export class AdminVoterController {
     constructor(private voterService: VoterService) {}
@@ -16,15 +16,15 @@ export class AdminVoterController {
      * Show voters management page
      */
     async showVoters(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const voters = this.voterService.getAllVoters();
 
-        return reply.view('admin/voters.ejs', {
-            title: 'Manage Voters',
-            voters
+        return reply.view("admin/voters.ejs", {
+            title: "Manage Voters",
+            voters,
         });
     }
 
@@ -32,18 +32,18 @@ export class AdminVoterController {
      * Show single voter details
      */
     async showVoter(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
+        if (!request.session.get("isAdmin")) {
             return this.redirectToLogin(request, reply);
         }
 
         const voter = this.voterService.getVoterById(request.params.id);
         if (!voter) {
-            return reply.status(404).send('Voter not found');
+            return reply.status(404).send("Voter not found");
         }
 
-        return reply.view('admin/voter-detail.ejs', {
+        return reply.view("admin/voter-detail.ejs", {
             title: `Voter: ${voter.name}`,
-            voter
+            voter,
         });
     }
 
@@ -51,8 +51,8 @@ export class AdminVoterController {
      * Approve voter
      */
     async approveVoter(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         try {
@@ -67,8 +67,8 @@ export class AdminVoterController {
      * Reject voter
      */
     async rejectVoter(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply): Promise<void> {
-        if (!request.session.get('isAdmin')) {
-            return reply.status(401).send({ error: 'Unauthorized' });
+        if (!request.session.get("isAdmin")) {
+            return reply.status(401).send({ error: "Unauthorized" });
         }
 
         try {

@@ -5,13 +5,7 @@ export class Candidate {
     private _party: string;
     private _biography: string;
 
-    constructor(
-        candidateID: string,
-        electionID: string,
-        name: string,
-        party: string,
-        biography: string
-    ) {
+    constructor(candidateID: string, electionID: string, name: string, party: string, biography: string) {
         this._candidateID = candidateID;
         this._electionID = electionID;
         this._name = name;
@@ -43,7 +37,7 @@ export class Candidate {
     // Setters
     set name(value: string) {
         if (!value || value.trim().length === 0) {
-            throw new Error('Candidate name cannot be empty');
+            throw new Error("Candidate name cannot be empty");
         }
         this._name = value;
     }

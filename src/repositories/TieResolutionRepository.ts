@@ -1,10 +1,10 @@
-import Database from 'better-sqlite3';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { DatabaseConnection } from "../db/connection";
 
 export interface TieResolution {
     resolutionID: string;
     electionID: string;
-    resolutionType: 'RANDOM' | 'MANUAL' | 'RECALL';
+    resolutionType: "RANDOM" | "MANUAL" | "RECALL";
     winnerCandidateID: string | null;
     resolvedBy: string;
     resolvedAt: Date;
@@ -65,7 +65,7 @@ export class TieResolutionRepository implements ITieResolutionRepository {
             winnerCandidateID: row.winner_candidate_id,
             resolvedBy: row.resolved_by,
             resolvedAt: new Date(row.resolved_at),
-            notes: row.notes
+            notes: row.notes,
         };
     }
 }

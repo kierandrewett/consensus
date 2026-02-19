@@ -3,8 +3,8 @@
  * when their end date/time is reached and starts elections when their start date is reached.
  */
 
-import { ElectionService } from './ElectionService';
-import { ElectionStatus } from '../domain/enums';
+import { ElectionService } from "./ElectionService";
+import { ElectionStatus } from "../domain/enums";
 
 export class ElectionScheduler {
     private intervalId: NodeJS.Timeout | null = null;
@@ -22,15 +22,15 @@ export class ElectionScheduler {
      */
     start(): void {
         if (this.intervalId) {
-            console.log('[Scheduler] Already running');
+            console.log("[Scheduler] Already running");
             return;
         }
 
         console.log(`[Scheduler] Starting election scheduler (checking every ${this.checkIntervalMs / 1000}s)`);
-        
+
         // Run immediately on start
         this.checkElections();
-        
+
         // Then run on interval
         this.intervalId = setInterval(() => {
             this.checkElections();
@@ -44,7 +44,7 @@ export class ElectionScheduler {
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
-            console.log('[Scheduler] Stopped');
+            console.log("[Scheduler] Stopped");
         }
     }
 

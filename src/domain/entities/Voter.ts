@@ -1,4 +1,4 @@
-import { RegistrationStatus } from '../enums';
+import { RegistrationStatus } from "../enums";
 
 export class Voter {
     private _voterID: string;
@@ -52,21 +52,21 @@ export class Voter {
     // Setters (Controlled mutation)
     set name(value: string) {
         if (!value || value.trim().length === 0) {
-            throw new Error('Name cannot be empty');
+            throw new Error("Name cannot be empty");
         }
         this._name = value;
     }
 
     set email(value: string) {
-        if (!value || !value.includes('@')) {
-            throw new Error('Invalid email address');
+        if (!value || !value.includes("@")) {
+            throw new Error("Invalid email address");
         }
         this._email = value;
     }
 
     set passwordHash(value: string) {
         if (!value || value.length === 0) {
-            throw new Error('Password hash cannot be empty');
+            throw new Error("Password hash cannot be empty");
         }
         this._passwordHash = value;
     }

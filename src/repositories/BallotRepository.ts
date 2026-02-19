@@ -1,7 +1,7 @@
-import Database from 'better-sqlite3';
-import { Ballot } from '../domain/entities/Ballot';
-import { IBallotRepository } from './interfaces/IBallotRepository';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { Ballot } from "../domain/entities/Ballot";
+import { IBallotRepository } from "./interfaces/IBallotRepository";
+import { DatabaseConnection } from "../db/connection";
 
 export class BallotRepository implements IBallotRepository {
     private db: Database.Database;
@@ -16,12 +16,7 @@ export class BallotRepository implements IBallotRepository {
             VALUES (?, ?, ?, ?)
         `);
 
-        stmt.run(
-            ballot.ballotID,
-            ballot.electionID,
-            JSON.stringify(ballot.preferences),
-            ballot.castAt.toISOString()
-        );
+        stmt.run(ballot.ballotID, ballot.electionID, JSON.stringify(ballot.preferences), ballot.castAt.toISOString());
     }
 
     findById(ballotID: string): Ballot | null {
@@ -39,7 +34,7 @@ export class BallotRepository implements IBallotRepository {
         `);
 
         const rows = stmt.all(electionID) as any[];
-        return rows.map(row => this.mapRowToBallot(row));
+        return rows.map((row) => this.mapRowToBallot(row));
     }
 
     countByElectionId(electionID: string): number {
@@ -63,11 +58,6 @@ export class BallotRepository implements IBallotRepository {
     }
 
     private mapRowToBallot(row: any): Ballot {
-        return new Ballot(
-            row.ballot_id,
-            row.election_id,
-            JSON.parse(row.preferences),
-            new Date(row.cast_at)
-        );
+        return new Ballot(row.ballot_id, row.election_id, JSON.parse(row.preferences), new Date(row.cast_at));
     }
 }

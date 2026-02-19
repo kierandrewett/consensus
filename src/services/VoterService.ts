@@ -1,7 +1,7 @@
-import { randomUUID } from 'crypto';
-import { Voter } from '../domain/entities/Voter';
-import { RegistrationStatus } from '../domain/enums';
-import { IVoterRepository } from '../repositories/interfaces/IVoterRepository';
+import { randomUUID } from "crypto";
+import { Voter } from "../domain/entities/Voter";
+import { RegistrationStatus } from "../domain/enums";
+import { IVoterRepository } from "../repositories/interfaces/IVoterRepository";
 
 export interface VoterRegistrationDTO {
     name: string;
@@ -22,17 +22,17 @@ export class VoterService {
         // Check if email already exists
         const existingVoter = this.voterRepository.findByEmail(dto.email);
         if (existingVoter) {
-            throw new Error('Email already registered');
+            throw new Error("Email already registered");
         }
 
         // Validate email format
         if (!this.isValidEmail(dto.email)) {
-            throw new Error('Invalid email format');
+            throw new Error("Invalid email format");
         }
 
         // Validate password strength
         if (dto.password.length < 8) {
-            throw new Error('Password must be at least 8 characters');
+            throw new Error("Password must be at least 8 characters");
         }
 
         // Create voter with PENDING or APPROVED status based on autoApprove
@@ -70,7 +70,7 @@ export class VoterService {
     approveVoter(voterID: string): void {
         const voter = this.voterRepository.findById(voterID);
         if (!voter) {
-            throw new Error('Voter not found');
+            throw new Error("Voter not found");
         }
 
         voter.registrationStatus = RegistrationStatus.APPROVED;
@@ -83,7 +83,7 @@ export class VoterService {
     rejectVoter(voterID: string): void {
         const voter = this.voterRepository.findById(voterID);
         if (!voter) {
-            throw new Error('Voter not found');
+            throw new Error("Voter not found");
         }
 
         voter.registrationStatus = RegistrationStatus.REJECTED;
@@ -103,17 +103,17 @@ export class VoterService {
     updateVoter(voterID: string, updates: { name?: string; email?: string; passwordHash?: string }): Voter {
         const voter = this.voterRepository.findById(voterID);
         if (!voter) {
-            throw new Error('Voter not found');
+            throw new Error("Voter not found");
         }
 
         // Check if email is being changed and if new email already exists
         if (updates.email && updates.email !== voter.email) {
             const existingVoter = this.voterRepository.findByEmail(updates.email);
             if (existingVoter) {
-                throw new Error('Email already registered');
+                throw new Error("Email already registered");
             }
             if (!this.isValidEmail(updates.email)) {
-                throw new Error('Invalid email format');
+                throw new Error("Invalid email format");
             }
             voter.email = updates.email;
         }
@@ -136,7 +136,7 @@ export class VoterService {
     deleteVoter(voterID: string): void {
         const voter = this.voterRepository.findById(voterID);
         if (!voter) {
-            throw new Error('Voter not found');
+            throw new Error("Voter not found");
         }
         this.voterRepository.delete(voterID);
     }

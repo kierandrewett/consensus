@@ -1,10 +1,10 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { ElectionService } from '../services/ElectionService';
-import { VotingService } from '../services/VotingService';
-import { VoterService } from '../services/VoterService';
-import { TieResolutionRepository } from '../repositories/TieResolutionRepository';
-import { SettingsRepository } from '../repositories/SettingsRepository';
-import { createHash } from 'crypto';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { ElectionService } from "../services/ElectionService";
+import { VotingService } from "../services/VotingService";
+import { VoterService } from "../services/VoterService";
+import { TieResolutionRepository } from "../repositories/TieResolutionRepository";
+import { SettingsRepository } from "../repositories/SettingsRepository";
+import { createHash } from "crypto";
 
 export class ElectionController {
     constructor(
@@ -19,11 +19,11 @@ export class ElectionController {
      * Get guest voter ID from IP address
      */
     private getGuestVoterIDFromIP(request: FastifyRequest): string | null {
-        const ip = request.ip || request.headers['x-forwarded-for'] || 'unknown';
+        const ip = request.ip || request.headers["x-forwarded-for"] || "unknown";
         const ipString = Array.isArray(ip) ? ip[0] : ip;
-        const hashedIP = createHash('sha256').update(ipString).digest('hex').substring(0, 16);
+        const hashedIP = createHash("sha256").update(ipString).digest("hex").substring(0, 16);
         const guestEmail = `guest_${hashedIP}@guest.local`;
-        
+
         const voter = this.voterService?.getVoterByEmail(guestEmail);
         return voter?.voterID || null;
     }
@@ -37,7 +37,7 @@ export class ElectionController {
         const guestVotingEnabled = this.settingsRepository?.getAll().guestVotingEnabled ?? false;
         let effectiveVoterID = request.session.voterID;
         let isGuest = false;
-        
+
         // Only check for guest voter IDs if guest voting is enabled
         if (!effectiveVoterID && guestVotingEnabled) {
             const guestVoterID = request.session.guestVoterID;
@@ -58,27 +58,27 @@ export class ElectionController {
         const votedElections = new Set<string>();
         if (effectiveVoterID) {
             const vid = effectiveVoterID; // Capture for closure
-            elections.forEach(election => {
+            elections.forEach((election) => {
                 if (this.votingService.hasVoted(vid, election.electionID)) {
                     votedElections.add(election.electionID);
                 }
             });
             // Also check closed elections
-            closedElections.forEach(election => {
+            closedElections.forEach((election) => {
                 if (this.votingService.hasVoted(vid, election.electionID)) {
                     votedElections.add(election.electionID);
                 }
             });
         }
 
-        return reply.view('elections/list.ejs', {
-            title: 'Elections',
+        return reply.view("elections/list.ejs", {
+            title: "Elections",
             elections,
             closedElections,
             votedElections: Array.from(votedElections),
             isAdmin: request.session.isAdmin || false,
             isGuest,
-            guestVotingEnabled
+            guestVotingEnabled,
         });
     }
 
@@ -90,9 +90,9 @@ export class ElectionController {
 
         const election = this.electionService.getElectionById(electionID);
         if (!election) {
-            return reply.status(404).view('error.ejs', {
-                title: 'Not Found',
-                error: 'Election not found'
+            return reply.status(404).view("error.ejs", {
+                title: "Not Found",
+                error: "Election not found",
             });
         }
 
@@ -104,10 +104,10 @@ export class ElectionController {
         let tieResolution = null;
         let winner = null;
 
-        if (election.status === 'CLOSED') {
+        if (election.status === "CLOSED") {
             results = this.votingService.calculateResults(electionID);
             tieResolution = this.tieResolutionRepository.findByElectionId(electionID);
-            
+
             // Determine winner
             if (tieResolution && tieResolution.winnerCandidateID) {
                 // Winner from tie resolution
@@ -121,14 +121,14 @@ export class ElectionController {
             }
         }
 
-        return reply.view('elections/details.ejs', {
+        return reply.view("elections/details.ejs", {
             title: election.name,
             election,
             candidates,
             voteCount,
             results,
             tieResolution,
-            winner
+            winner,
         });
     }
 
@@ -141,9 +141,9 @@ export class ElectionController {
         try {
             const election = this.electionService.getElectionById(electionID);
             if (!election) {
-                return reply.status(404).view('error.ejs', {
-                    title: 'Not Found',
-                    error: 'Election not found'
+                return reply.status(404).view("error.ejs", {
+                    title: "Not Found",
+                    error: "Election not found",
                 });
             }
 
@@ -151,17 +151,17 @@ export class ElectionController {
             const totalVotes = this.votingService.getVoteCount(electionID);
             const tieResolution = this.tieResolutionRepository.findByElectionId(electionID);
 
-            return reply.view('elections/results.ejs', {
+            return reply.view("elections/results.ejs", {
                 title: `Results: ${election.name}`,
                 election,
                 results,
                 totalVotes,
-                tieResolution
+                tieResolution,
             });
         } catch (error: any) {
-            return reply.view('error.ejs', {
-                title: 'Error',
-                error: error.message
+            return reply.view("error.ejs", {
+                title: "Error",
+                error: error.message,
             });
         }
     }

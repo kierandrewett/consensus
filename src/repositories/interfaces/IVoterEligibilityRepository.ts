@@ -1,4 +1,4 @@
-import { VoterEligibility } from '../../domain/entities/VoterEligibility';
+import { VoterEligibility } from "../../domain/entities/VoterEligibility";
 
 export interface IVoterEligibilityRepository {
     save(eligibility: VoterEligibility): void;

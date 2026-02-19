@@ -1,5 +1,5 @@
-import { ElectionType, ElectionStatus } from './enums';
-import { Candidate } from './Candidate';
+import { ElectionType, ElectionStatus } from "./enums";
+import { Candidate } from "./Candidate";
 
 export class Election {
     private _electionID: string;
@@ -70,7 +70,7 @@ export class Election {
 
     set name(value: string) {
         if (!value || value.trim().length === 0) {
-            throw new Error('Election name cannot be empty');
+            throw new Error("Election name cannot be empty");
         }
         this._name = value;
     }
@@ -78,9 +78,7 @@ export class Election {
     // Business methods
     isActive(): boolean {
         const now = new Date();
-        return this._status === ElectionStatus.ACTIVE &&
-               now >= this._startDate &&
-               now <= this._endDate;
+        return this._status === ElectionStatus.ACTIVE && now >= this._startDate && now <= this._endDate;
     }
 
     isClosed(): boolean {
@@ -89,16 +87,16 @@ export class Election {
 
     addCandidate(candidate: Candidate): void {
         if (this._status !== ElectionStatus.DRAFT) {
-            throw new Error('Cannot add candidates to non-draft election');
+            throw new Error("Cannot add candidates to non-draft election");
         }
         this._candidates.push(candidate);
     }
 
     removeCandidate(candidateID: string): void {
         if (this._status !== ElectionStatus.DRAFT) {
-            throw new Error('Cannot remove candidates from non-draft election');
+            throw new Error("Cannot remove candidates from non-draft election");
         }
-        this._candidates = this._candidates.filter(c => c.candidateID !== candidateID);
+        this._candidates = this._candidates.filter((c) => c.candidateID !== candidateID);
     }
 
     getCandidateCount(): number {

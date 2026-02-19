@@ -1,6 +1,6 @@
-import { randomUUID } from 'crypto';
-import { Ballot } from '../../domain/entities/Ballot';
-import { ElectionType } from '../../domain/enums';
+import { randomUUID } from "crypto";
+import { Ballot } from "../../domain/entities/Ballot";
+import { ElectionType } from "../../domain/enums";
 
 export class BallotFactory {
     /**
@@ -24,7 +24,7 @@ export class BallotFactory {
             case ElectionType.FPTP:
                 // FPTP requires single candidate selection
                 if (!candidateID) {
-                    throw new Error('FPTP ballots require a candidateID');
+                    throw new Error("FPTP ballots require a candidateID");
                 }
                 // Store as single-item preferences array
                 return new Ballot(ballotID, electionID, [candidateID], castAt);
@@ -50,11 +50,7 @@ export class BallotFactory {
      * @param preferences Ranked preferences
      * @returns true if valid, false otherwise
      */
-    static validateBallotData(
-        electionType: ElectionType,
-        candidateID?: string,
-        preferences?: string[]
-    ): boolean {
+    static validateBallotData(electionType: ElectionType, candidateID?: string, preferences?: string[]): boolean {
         switch (electionType) {
             case ElectionType.FPTP:
                 return candidateID !== undefined && preferences === undefined;

@@ -29,7 +29,7 @@ function updateCountdowns(config: CountdownConfig): void {
     const countdowns = document.querySelectorAll<HTMLElement>(config.selector);
     const now = Date.now();
 
-    countdowns.forEach(el => {
+    countdowns.forEach((el) => {
         const endDateStr = el.dataset.end;
         if (!endDateStr) return;
 
@@ -54,9 +54,9 @@ function updateCountdowns(config: CountdownConfig): void {
 // Admin results page countdowns
 function initAdminResultsCountdown(): void {
     const config: CountdownConfig = {
-        selector: '.result-countdown',
-        endingClass: 'countdown-ending',
-        closingText: 'Closing...'
+        selector: ".result-countdown",
+        endingClass: "countdown-ending",
+        closingText: "Closing...",
     };
 
     if (document.querySelector(config.selector)) {
@@ -68,9 +68,9 @@ function initAdminResultsCountdown(): void {
 // Voter elections list countdowns
 function initElectionsListCountdown(): void {
     const config: CountdownConfig = {
-        selector: '.election-countdown',
-        endingClass: 'ending',
-        closingText: 'Closing soon...'
+        selector: ".election-countdown",
+        endingClass: "ending",
+        closingText: "Closing soon...",
     };
 
     if (document.querySelector(config.selector)) {
@@ -80,7 +80,7 @@ function initElectionsListCountdown(): void {
 }
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     initAdminResultsCountdown();
     initElectionsListCountdown();
 });

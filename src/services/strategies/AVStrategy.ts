@@ -1,16 +1,16 @@
-import { Ballot } from '../../domain/entities/Ballot';
-import { Candidate } from '../../domain/entities/Candidate';
-import { IVotingStrategy, VoteResult } from './IVotingStrategy';
+import { Ballot } from "../../domain/entities/Ballot";
+import { Candidate } from "../../domain/entities/Candidate";
+import { IVotingStrategy, VoteResult } from "./IVotingStrategy";
 
 export class AVStrategy implements IVotingStrategy {
     calculateResults(ballots: Ballot[], candidates: Candidate[]): VoteResult[] {
         const totalVotes = ballots.length;
         const majority = Math.floor(totalVotes / 2) + 1;
 
-        let activeCandidates = new Set(candidates.map(c => c.candidateID));
-        let ballotStates = ballots.map(b => ({
+        let activeCandidates = new Set(candidates.map((c) => c.candidateID));
+        let ballotStates = ballots.map((b) => ({
             ballot: b,
-            currentPreference: 0
+            currentPreference: 0,
         }));
 
         let finalCounts = new Map<string, number>();
@@ -19,9 +19,9 @@ export class AVStrategy implements IVotingStrategy {
         while (activeCandidates.size > 1) {
             // Count votes at current preference level
             const roundCounts = new Map<string, number>();
-            activeCandidates.forEach(c => roundCounts.set(c, 0));
+            activeCandidates.forEach((c) => roundCounts.set(c, 0));
 
-            ballotStates.forEach(bs => {
+            ballotStates.forEach((bs) => {
                 if (bs.ballot.preferences && bs.currentPreference < bs.ballot.preferences.length) {
                     const currentChoice = bs.ballot.preferences[bs.currentPreference];
                     if (activeCandidates.has(currentChoice)) {
@@ -76,14 +76,14 @@ export class AVStrategy implements IVotingStrategy {
 
         // Create results
         const maxVotes = Math.max(...Array.from(finalCounts.values()));
-        const results: VoteResult[] = candidates.map(candidate => {
+        const results: VoteResult[] = candidates.map((candidate) => {
             const votes = finalCounts.get(candidate.candidateID) || 0;
             return {
                 candidateID: candidate.candidateID,
                 candidateName: candidate.name,
                 votes,
                 percentage: totalVotes > 0 ? (votes / totalVotes) * 100 : 0,
-                isWinner: votes === maxVotes && votes > 0
+                isWinner: votes === maxVotes && votes > 0,
             };
         });
 

@@ -1,8 +1,8 @@
-import Database from 'better-sqlite3';
-import { Election } from '../domain/entities/Election';
-import { ElectionType, ElectionStatus } from '../domain/enums';
-import { IElectionRepository } from './interfaces/IElectionRepository';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { Election } from "../domain/entities/Election";
+import { ElectionType, ElectionStatus } from "../domain/enums";
+import { IElectionRepository } from "./interfaces/IElectionRepository";
+import { DatabaseConnection } from "../db/connection";
 
 export class ElectionRepository implements IElectionRepository {
     private db: Database.Database;
@@ -43,7 +43,7 @@ export class ElectionRepository implements IElectionRepository {
         `);
 
         const rows = stmt.all(status) as any[];
-        return rows.map(row => this.mapRowToElection(row));
+        return rows.map((row) => this.mapRowToElection(row));
     }
 
     findActive(): Election[] {
@@ -56,7 +56,7 @@ export class ElectionRepository implements IElectionRepository {
         `);
 
         const rows = stmt.all(now, now) as any[];
-        return rows.map(row => this.mapRowToElection(row));
+        return rows.map((row) => this.mapRowToElection(row));
     }
 
     update(election: Election): void {
@@ -91,7 +91,7 @@ export class ElectionRepository implements IElectionRepository {
         `);
 
         const rows = stmt.all() as any[];
-        return rows.map(row => this.mapRowToElection(row));
+        return rows.map((row) => this.mapRowToElection(row));
     }
 
     private mapRowToElection(row: any): Election {

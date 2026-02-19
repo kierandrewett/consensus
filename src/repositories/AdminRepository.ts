@@ -1,6 +1,6 @@
-import Database from 'better-sqlite3';
-import { Admin } from '../domain/entities/Admin';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { Admin } from "../domain/entities/Admin";
+import { DatabaseConnection } from "../db/connection";
 
 export class AdminRepository {
     private db: Database.Database;
@@ -72,14 +72,17 @@ export class AdminRepository {
 
         const rows = stmt.all() as any[];
 
-        return rows.map(row => new Admin(
-            row.admin_id,
-            row.username,
-            row.password_hash,
-            row.name,
-            new Date(row.created_at),
-            Boolean(row.must_change_password)
-        ));
+        return rows.map(
+            (row) =>
+                new Admin(
+                    row.admin_id,
+                    row.username,
+                    row.password_hash,
+                    row.name,
+                    new Date(row.created_at),
+                    Boolean(row.must_change_password)
+                )
+        );
     }
 
     /**
@@ -122,7 +125,7 @@ export class AdminRepository {
      * Delete admin by ID
      */
     delete(adminID: string): void {
-        const stmt = this.db.prepare('DELETE FROM admins WHERE admin_id = ?');
+        const stmt = this.db.prepare("DELETE FROM admins WHERE admin_id = ?");
         stmt.run(adminID);
     }
 }

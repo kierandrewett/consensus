@@ -1,7 +1,7 @@
-import Database from 'better-sqlite3';
-import { VoterEligibility } from '../domain/entities/VoterEligibility';
-import { IVoterEligibilityRepository } from './interfaces/IVoterEligibilityRepository';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { VoterEligibility } from "../domain/entities/VoterEligibility";
+import { IVoterEligibilityRepository } from "./interfaces/IVoterEligibilityRepository";
+import { DatabaseConnection } from "../db/connection";
 
 export class VoterEligibilityRepository implements IVoterEligibilityRepository {
     private db: Database.Database;
@@ -40,7 +40,7 @@ export class VoterEligibilityRepository implements IVoterEligibilityRepository {
         `);
 
         const rows = stmt.all(voterID) as any[];
-        return rows.map(row => this.mapRowToEligibility(row));
+        return rows.map((row) => this.mapRowToEligibility(row));
     }
 
     findByElectionId(electionID: string): VoterEligibility[] {
@@ -49,7 +49,7 @@ export class VoterEligibilityRepository implements IVoterEligibilityRepository {
         `);
 
         const rows = stmt.all(electionID) as any[];
-        return rows.map(row => this.mapRowToEligibility(row));
+        return rows.map((row) => this.mapRowToEligibility(row));
     }
 
     hasVoted(voterID: string, electionID: string): boolean {

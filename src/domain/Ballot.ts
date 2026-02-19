@@ -4,12 +4,7 @@ export class Ballot {
     private _choices: string[]; // Array of candidate IDs in preference order
     private _timestamp: Date;
 
-    constructor(
-        ballotID: string,
-        electionID: string,
-        choices: string[],
-        timestamp: Date = new Date()
-    ) {
+    constructor(ballotID: string, electionID: string, choices: string[], timestamp: Date = new Date()) {
         this._ballotID = ballotID;
         this._electionID = electionID;
         this._choices = choices;

@@ -1,5 +1,5 @@
-import { ChildProcess, spawn, execSync } from 'child_process';
-import puppeteer, { Browser } from 'puppeteer';
+import { ChildProcess, spawn, execSync } from "child_process";
+import puppeteer, { Browser } from "puppeteer";
 
 const TEST_PORT = 3099;
 
@@ -12,7 +12,7 @@ let browser: Browser;
 function killProcessOnPort(port: number): void {
     try {
         // Try to find and kill any process using the port
-        execSync(`lsof -ti :${port} | xargs kill -9 2>/dev/null || true`, { stdio: 'ignore' });
+        execSync(`lsof -ti :${port} | xargs kill -9 2>/dev/null || true`, { stdio: "ignore" });
         console.log(`[E2E Setup] Killed existing process on port ${port}`);
     } catch {
         // No process to kill, that's fine
@@ -26,135 +26,137 @@ async function waitForServer(url: string, timeout: number, serverProcess: ChildP
     return new Promise((resolve, reject) => {
         let serverError: string | null = null;
         let hasResolved = false;
-        
+
         // Listen for server startup errors
         const errorHandler = (data: Buffer) => {
             const output = data.toString();
-            if (output.includes('EADDRINUSE') || output.includes('address already in use')) {
+            if (output.includes("EADDRINUSE") || output.includes("address already in use")) {
                 serverError = `Port ${TEST_PORT} is already in use. Kill the existing process and try again.`;
             }
         };
-        
+
         // Capture stderr for error detection
-        serverProcess.stderr?.on('data', errorHandler);
-        
+        serverProcess.stderr?.on("data", errorHandler);
+
         // Check for process exit
-        serverProcess.on('exit', (code) => {
+        serverProcess.on("exit", (code) => {
             if (!hasResolved && code !== null && code !== 0) {
                 reject(new Error(serverError || `Server exited with code ${code}`));
             }
         });
-        
+
         // Poll for server readiness
         const start = Date.now();
         const checkServer = async () => {
             if (hasResolved) return;
-            
+
             // Check if we have a startup error
             if (serverError) {
                 hasResolved = true;
                 reject(new Error(serverError));
                 return;
             }
-            
+
             // Check timeout
             if (Date.now() - start > timeout) {
                 hasResolved = true;
                 reject(new Error(`Server did not start within ${timeout}ms`));
                 return;
             }
-            
+
             try {
                 const response = await fetch(url);
                 if (response.ok || response.status < 500) {
                     hasResolved = true;
-                    serverProcess.stderr?.off('data', errorHandler);
+                    serverProcess.stderr?.off("data", errorHandler);
                     resolve();
                     return;
                 }
             } catch {
                 // Server not ready yet
             }
-            
+
             setTimeout(checkServer, 200);
         };
-        
+
         checkServer();
     });
 }
 
 export default async function globalSetup() {
-    console.log('[E2E Setup] Starting server with NODE_ENV=test');
-    
+    console.log("[E2E Setup] Starting server with NODE_ENV=test");
+
     // Kill any existing process on the test port first
     killProcessOnPort(TEST_PORT);
-    
+
     // Small delay to ensure port is freed
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     // Reset and seed the database before starting the server
-    console.log('[E2E Setup] Resetting database...');
+    console.log("[E2E Setup] Resetting database...");
     try {
-        execSync('node dist/seed.js --reset', { 
+        execSync("node dist/seed.js --reset", {
             cwd: process.cwd(),
-            stdio: 'inherit',
-            env: { ...process.env, NODE_ENV: 'test' }
+            stdio: "inherit",
+            env: { ...process.env, NODE_ENV: "test" },
         });
     } catch (error) {
         // Reset may fail if DB doesn't exist, that's OK
     }
-    
-    console.log('[E2E Setup] Seeding database...');
+
+    console.log("[E2E Setup] Seeding database...");
     try {
-        execSync('node dist/seed.js', { 
+        execSync("node dist/seed.js", {
             cwd: process.cwd(),
-            stdio: 'inherit',
-            env: { ...process.env, NODE_ENV: 'test' }
+            stdio: "inherit",
+            env: { ...process.env, NODE_ENV: "test" },
         });
-        console.log('[E2E Setup] Database seeded successfully');
+        console.log("[E2E Setup] Database seeded successfully");
     } catch (error) {
-        console.error('[E2E Setup] Failed to seed database:', error);
-        throw new Error('E2E Setup failed: Could not seed database');
+        console.error("[E2E Setup] Failed to seed database:", error);
+        throw new Error("E2E Setup failed: Could not seed database");
     }
-    
+
     // Start server with explicit test environment
-    const serverEnv = { 
-        ...process.env, 
-        PORT: String(TEST_PORT), 
-        NODE_ENV: 'test' 
+    const serverEnv = {
+        ...process.env,
+        PORT: String(TEST_PORT),
+        NODE_ENV: "test",
     };
-    
+
     // Log to verify NODE_ENV is set
-    console.log('[E2E Setup] Server environment NODE_ENV:', serverEnv.NODE_ENV);
-    
-    serverProcess = spawn('node', ['dist/index.js'], {
+    console.log("[E2E Setup] Server environment NODE_ENV:", serverEnv.NODE_ENV);
+
+    serverProcess = spawn("node", ["dist/index.js"], {
         cwd: process.cwd(),
         env: serverEnv,
-        stdio: ['pipe', 'ignore', 'pipe'], // stdin, stdout (ignored), stderr
+        stdio: ["pipe", "ignore", "pipe"], // stdin, stdout (ignored), stderr
         detached: true,
     });
-    
+
     // Pipe server errors to console
-    serverProcess.stderr?.on('data', (data) => process.stderr.write(data));
+    serverProcess.stderr?.on("data", (data) => process.stderr.write(data));
 
     const baseUrl = `http://127.0.0.1:${TEST_PORT}`;
-    
+
     try {
         await waitForServer(baseUrl, 15000, serverProcess);
-        console.log('[E2E Setup] Server started successfully on', baseUrl);
+        console.log("[E2E Setup] Server started successfully on", baseUrl);
     } catch (error) {
         // Make sure to kill the server process if startup failed
         try {
-            serverProcess.kill('SIGKILL');
-        } catch { /* ignore */ }
+            serverProcess.kill("SIGKILL");
+        } catch {
+            /* ignore */
+        }
         throw error;
     }
 
     // Launch browser
     browser = await puppeteer.launch({
         headless: !!process.env.CI,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        slowMo: process.env.CI ? 0 : 50
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        slowMo: process.env.CI ? 0 : 50,
     });
 
     // Store references globally

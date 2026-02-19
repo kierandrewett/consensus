@@ -1,7 +1,7 @@
-import { randomUUID } from 'crypto';
-import { Voter } from '../../domain/entities/Voter';
-import { Ballot } from '../../domain/entities/Ballot';
-import { VoteConfirmation } from '../../domain/entities/VoteConfirmation';
+import { randomUUID } from "crypto";
+import { Voter } from "../../domain/entities/Voter";
+import { Ballot } from "../../domain/entities/Ballot";
+import { VoteConfirmation } from "../../domain/entities/VoteConfirmation";
 
 export interface VoteInput {
     voter: Voter;
@@ -26,34 +26,22 @@ export class AnonymousBallotAdapter {
         } else if (voteInput.candidateID) {
             preferences = [voteInput.candidateID];
         } else {
-            throw new Error('Either candidateID or preferences must be provided');
+            throw new Error("Either candidateID or preferences must be provided");
         }
 
         // Create anonymous ballot - no reference to voter
-        const ballot = new Ballot(
-            randomUUID(),
-            voteInput.electionID,
-            preferences,
-            now
-        );
+        const ballot = new Ballot(randomUUID(), voteInput.electionID, preferences, now);
 
         // Create confirmation for voter - no vote details
-        const confirmation = new VoteConfirmation(
-            randomUUID(),
-            voteInput.voter.voterID,
-            voteInput.electionID,
-            now
-        );
+        const confirmation = new VoteConfirmation(randomUUID(), voteInput.voter.voterID, voteInput.electionID, now);
 
         return {
             ballot,
-            confirmation
+            confirmation,
         };
     }
 
     verifyAnonymity(ballot: Ballot): boolean {
-        return ballot.ballotID !== undefined &&
-               ballot.electionID !== undefined &&
-               ballot.castAt !== undefined;
+        return ballot.ballotID !== undefined && ballot.electionID !== undefined && ballot.castAt !== undefined;
     }
 }

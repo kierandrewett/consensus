@@ -1,4 +1,4 @@
-import { createIcons, icons } from 'lucide';
+import { createIcons, icons } from "lucide";
 
 // Debounce to avoid excessive re-renders
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -11,8 +11,8 @@ function refreshIcons() {
 }
 
 // Initialize icons when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
         createIcons({ icons });
         observeMutations();
     });
@@ -25,14 +25,14 @@ if (document.readyState === 'loading') {
 function observeMutations() {
     const observer = new MutationObserver((mutations) => {
         let shouldRefresh = false;
-        
+
         for (const mutation of mutations) {
             // Check added nodes
-            if (mutation.type === 'childList') {
+            if (mutation.type === "childList") {
                 for (const node of mutation.addedNodes as any) {
                     if (node instanceof Element) {
                         // Check if node or its descendants have data-lucide
-                        if (node.hasAttribute('data-lucide') || node.querySelector('[data-lucide]')) {
+                        if (node.hasAttribute("data-lucide") || node.querySelector("[data-lucide]")) {
                             shouldRefresh = true;
                             break;
                         }
@@ -41,15 +41,15 @@ function observeMutations() {
             }
             if (shouldRefresh) break;
         }
-        
+
         if (shouldRefresh) {
             refreshIcons();
         }
     });
-    
+
     observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
     });
 }
 

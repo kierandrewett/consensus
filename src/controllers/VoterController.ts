@@ -1,11 +1,11 @@
-import { FastifyRequest, FastifyReply } from 'fastify';
-import { VoterService, VoterRegistrationDTO } from '../services/VoterService';
-import { ElectionService } from '../services/ElectionService';
-import { VotingService } from '../services/VotingService';
-import { ValidationUtil } from '../utils/validation';
-import { PasswordUtil } from '../utils/password';
-import { TurnstileUtil } from '../utils/turnstile';
-import { SettingsRepository } from '../repositories/SettingsRepository';
+import { FastifyRequest, FastifyReply } from "fastify";
+import { VoterService, VoterRegistrationDTO } from "../services/VoterService";
+import { ElectionService } from "../services/ElectionService";
+import { VotingService } from "../services/VotingService";
+import { ValidationUtil } from "../utils/validation";
+import { PasswordUtil } from "../utils/password";
+import { TurnstileUtil } from "../utils/turnstile";
+import { SettingsRepository } from "../repositories/SettingsRepository";
 
 export class VoterController {
     constructor(
@@ -21,36 +21,36 @@ export class VoterController {
     async showRegistrationForm(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter pages
         if (request.session.isAdmin) {
-            return reply.redirect('/admin');
+            return reply.redirect("/admin");
         }
 
         // Already logged in as voter
         if (request.session.voterID) {
-            return reply.redirect('/dashboard');
+            return reply.redirect("/dashboard");
         }
 
         // Check if registration is enabled
         const settings = this.settingsRepository?.getAll();
         const signupEnabled = settings?.signupEnabled ?? true;
 
-        const error = request.session.get('registrationError') || null;
-        const formName = request.session.get('registrationFormName') || '';
-        const formEmail = request.session.get('registrationFormEmail') || '';
-        request.session.set('registrationError', undefined);
-        request.session.set('registrationFormName', undefined);
-        request.session.set('registrationFormEmail', undefined);
-        
+        const error = request.session.get("registrationError") || null;
+        const formName = request.session.get("registrationFormName") || "";
+        const formEmail = request.session.get("registrationFormEmail") || "";
+        request.session.set("registrationError", undefined);
+        request.session.set("registrationFormName", undefined);
+        request.session.set("registrationFormEmail", undefined);
+
         // Get Turnstile settings (skip in development/test mode)
-        const skipTurnstile = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
-        
-        return reply.view('voter/register.ejs', {
-            title: 'Voter Registration',
+        const skipTurnstile = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
+
+        return reply.view("voter/register.ejs", {
+            title: "Voter Registration",
             error,
             formName,
             formEmail,
             signupEnabled,
             turnstileEnabled: skipTurnstile ? false : (settings?.turnstileEnabled ?? false),
-            turnstileSiteKey: settings?.turnstileSiteKey ?? ''
+            turnstileSiteKey: settings?.turnstileSiteKey ?? "",
         });
     }
 
@@ -60,43 +60,43 @@ export class VoterController {
     async register(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot register as voters
         if (request.session.isAdmin) {
-            return reply.redirect('/admin');
+            return reply.redirect("/admin");
         }
 
         // Already logged in as voter
         if (request.session.voterID) {
-            return reply.redirect('/dashboard');
+            return reply.redirect("/dashboard");
         }
 
         // Check if registration is enabled
         const settings = this.settingsRepository?.getAll();
         const signupEnabled = settings?.signupEnabled ?? true;
         if (!signupEnabled) {
-            request.session.set('registrationError', 'Registration is currently disabled');
-            return reply.redirect('/register');
+            request.session.set("registrationError", "Registration is currently disabled");
+            return reply.redirect("/register");
         }
 
         const body = request.body as any;
 
         try {
             // Verify Turnstile if enabled (skip in development/test mode)
-            const skipTurnstile = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+            const skipTurnstile = process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
             if (!skipTurnstile && settings?.turnstileEnabled && settings.turnstileSecretKey) {
-                const turnstileToken = body['cf-turnstile-response'];
+                const turnstileToken = body["cf-turnstile-response"];
                 const ip = Array.isArray(request.ip) ? request.ip[0] : request.ip;
                 const isValid = await TurnstileUtil.verify(turnstileToken, settings.turnstileSecretKey, ip);
                 if (!isValid) {
-                    throw new Error('CAPTCHA verification failed. Please try again.');
+                    throw new Error("CAPTCHA verification failed. Please try again.");
                 }
             }
 
             // Validate input
             if (!body.name || !body.email || !body.password) {
-                throw new Error('All fields are required');
+                throw new Error("All fields are required");
             }
 
             if (!ValidationUtil.isValidEmail(body.email)) {
-                throw new Error('Invalid email format');
+                throw new Error("Invalid email format");
             }
 
             // Hash password
@@ -109,7 +109,7 @@ export class VoterController {
             const dto: VoterRegistrationDTO = {
                 name: ValidationUtil.sanitize(body.name),
                 email: body.email.toLowerCase(),
-                password: passwordHash
+                password: passwordHash,
             };
 
             const voter = this.voterService.registerVoter(dto, autoApprovalEnabled);
@@ -119,15 +119,15 @@ export class VoterController {
             request.session.voterName = voter.name;
 
             // Store success data in session and redirect to success page
-            request.session.set('registrationSuccess', true);
-            request.session.set('newVoterID', voter.voterID);
-            return reply.redirect('/registration-success');
+            request.session.set("registrationSuccess", true);
+            request.session.set("newVoterID", voter.voterID);
+            return reply.redirect("/registration-success");
         } catch (error: any) {
             // Store error and form data in session and redirect
-            request.session.set('registrationError', error.message);
-            request.session.set('registrationFormName', body.name || '');
-            request.session.set('registrationFormEmail', body.email || '');
-            return reply.redirect('/register');
+            request.session.set("registrationError", error.message);
+            request.session.set("registrationFormName", body.name || "");
+            request.session.set("registrationFormEmail", body.email || "");
+            return reply.redirect("/register");
         }
     }
 
@@ -137,29 +137,29 @@ export class VoterController {
     async showLoginForm(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter login
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
         // Already logged in as voter
         if (request.session.voterID) {
-            return reply.redirect('/dashboard');
+            return reply.redirect("/dashboard");
         }
 
         // Check if login is enabled
         const loginEnabled = this.settingsRepository?.getAll().loginEnabled ?? true;
 
-        const error = request.session.get('loginError') || null;
-        request.session.set('loginError', undefined);
-        
+        const error = request.session.get("loginError") || null;
+        request.session.set("loginError", undefined);
+
         // Get redirect destination from query param
         const query = request.query as any;
         const redirectTo = query.to || null;
-        
-        return reply.view('voter/login.ejs', {
-            title: 'Voter Login',
+
+        return reply.view("voter/login.ejs", {
+            title: "Voter Login",
             error,
             redirectTo,
-            loginEnabled
+            loginEnabled,
         });
     }
 
@@ -169,36 +169,36 @@ export class VoterController {
     async login(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot login as voters
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
         // Already logged in as voter
         if (request.session.voterID) {
-            return reply.redirect('/dashboard');
+            return reply.redirect("/dashboard");
         }
 
         // Check if login is enabled
         const loginEnabled = this.settingsRepository?.getAll().loginEnabled ?? true;
         if (!loginEnabled) {
-            request.session.set('loginError', 'Login is currently disabled');
-            return reply.redirect('/login');
+            request.session.set("loginError", "Login is currently disabled");
+            return reply.redirect("/login");
         }
 
         const body = request.body as any;
 
         try {
             if (!body.email || !body.password) {
-                throw new Error('Email and password are required');
+                throw new Error("Email and password are required");
             }
 
             const voter = this.voterService.getVoterByEmail(body.email.toLowerCase());
             if (!voter) {
-                throw new Error('Invalid email or password');
+                throw new Error("Invalid email or password");
             }
 
             const isValid = await PasswordUtil.verify(body.password, voter.passwordHash);
             if (!isValid) {
-                throw new Error('Invalid email or password');
+                throw new Error("Invalid email or password");
             }
 
             // Set session
@@ -207,17 +207,17 @@ export class VoterController {
 
             // Redirect to intended destination or dashboard
             const redirectTo = body.redirectTo;
-            if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
+            if (redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")) {
                 return reply.redirect(redirectTo);
             }
-            return reply.redirect('/dashboard');
+            return reply.redirect("/dashboard");
         } catch (error: any) {
-            request.session.set('loginError', error.message);
+            request.session.set("loginError", error.message);
             const redirectTo = body.redirectTo;
             if (redirectTo) {
                 return reply.redirect(`/login?to=${encodeURIComponent(redirectTo)}`);
             }
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
     }
 
@@ -227,17 +227,17 @@ export class VoterController {
     async showDashboard(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter dashboard
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
         const voterID = request.session.voterID;
         if (!voterID) {
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
 
         const voter = this.voterService.getVoterById(voterID);
         if (!voter) {
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
 
         // Get available elections and voting history for approved voters
@@ -245,36 +245,36 @@ export class VoterController {
         let recentVotes: any[] = [];
         let votedCount = 0;
 
-        if (voter.registrationStatus === 'APPROVED' && this.electionService && this.votingService) {
+        if (voter.registrationStatus === "APPROVED" && this.electionService && this.votingService) {
             const activeElections = this.electionService.getActiveElections();
             const now = new Date();
-            
+
             // Filter to elections the voter hasn't voted in yet and are currently open
-            availableElections = activeElections.filter(e => {
+            availableElections = activeElections.filter((e) => {
                 const hasVoted = this.votingService!.hasVoted(voterID, e.electionID);
                 const isOpen = now >= e.startDate && now <= e.endDate;
                 return !hasVoted && isOpen;
             });
-            
+
             // Get recent confirmations with election names
             const confirmations = this.votingService.getVoterConfirmations(voterID);
-            recentVotes = confirmations.slice(0, 5).map(c => {
+            recentVotes = confirmations.slice(0, 5).map((c) => {
                 const election = this.electionService!.getElectionById(c.electionID);
                 return {
-                    electionName: election?.name || 'Unknown Election',
+                    electionName: election?.name || "Unknown Election",
                     timestamp: c.confirmedAt,
-                    confirmationCode: c.getConfirmationCode()
+                    confirmationCode: c.getConfirmationCode(),
                 };
             });
             votedCount = confirmations.length;
         }
 
-        return reply.view('voter/dashboard.ejs', {
-            title: 'Dashboard',
+        return reply.view("voter/dashboard.ejs", {
+            title: "Dashboard",
             voter,
             availableElections,
             recentVotes,
-            votedCount
+            votedCount,
         });
     }
 
@@ -284,28 +284,28 @@ export class VoterController {
     async showRegistrationSuccess(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter pages
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
-        const success = request.session.get('registrationSuccess');
-        const voterID = request.session.get('newVoterID');
-        
+        const success = request.session.get("registrationSuccess");
+        const voterID = request.session.get("newVoterID");
+
         if (!success || !voterID) {
-            return reply.redirect('/register');
+            return reply.redirect("/register");
         }
-        
+
         const voter = this.voterService.getVoterById(voterID);
         if (!voter) {
-            return reply.redirect('/register');
+            return reply.redirect("/register");
         }
-        
+
         // Clear session data
-        request.session.set('registrationSuccess', undefined);
-        request.session.set('newVoterID', undefined);
-        
-        return reply.view('voter/registration-success.ejs', {
-            title: 'Registration Successful',
-            voter
+        request.session.set("registrationSuccess", undefined);
+        request.session.set("newVoterID", undefined);
+
+        return reply.view("voter/registration-success.ejs", {
+            title: "Registration Successful",
+            voter,
         });
     }
 
@@ -315,9 +315,9 @@ export class VoterController {
     async logout(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         request.session.destroy((err: any) => {
             if (err) {
-                console.error('Session destruction error:', err);
+                console.error("Session destruction error:", err);
             }
-            reply.redirect('/');
+            reply.redirect("/");
         });
     }
 
@@ -327,29 +327,29 @@ export class VoterController {
     async showProfile(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter pages
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
         const voterID = request.session.voterID;
         if (!voterID) {
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
 
         const voter = this.voterService.getVoterById(voterID);
         if (!voter) {
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
 
-        const error = request.session.get('profileError') || null;
-        const success = request.session.get('profileSuccess') || null;
-        request.session.set('profileError', undefined);
-        request.session.set('profileSuccess', undefined);
+        const error = request.session.get("profileError") || null;
+        const success = request.session.get("profileSuccess") || null;
+        request.session.set("profileError", undefined);
+        request.session.set("profileSuccess", undefined);
 
-        return reply.view('voter/profile.ejs', {
-            title: 'My Profile',
+        return reply.view("voter/profile.ejs", {
+            title: "My Profile",
             voter,
             error,
-            success
+            success,
         });
     }
 
@@ -359,12 +359,12 @@ export class VoterController {
     async updateProfile(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter pages
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
         const voterID = request.session.voterID;
         if (!voterID) {
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
 
         const body = request.body as any;
@@ -372,7 +372,7 @@ export class VoterController {
         try {
             const voter = this.voterService.getVoterById(voterID);
             if (!voter) {
-                throw new Error('Voter not found');
+                throw new Error("Voter not found");
             }
 
             const updates: { name?: string; email?: string; passwordHash?: string } = {};
@@ -385,7 +385,7 @@ export class VoterController {
             // Update email if provided
             if (body.email && body.email.toLowerCase() !== voter.email) {
                 if (!ValidationUtil.isValidEmail(body.email)) {
-                    throw new Error('Invalid email format');
+                    throw new Error("Invalid email format");
                 }
                 updates.email = body.email.toLowerCase();
             }
@@ -394,12 +394,12 @@ export class VoterController {
             if (body.newPassword) {
                 // Verify current password
                 if (!body.currentPassword) {
-                    throw new Error('Current password is required to change password');
+                    throw new Error("Current password is required to change password");
                 }
 
                 const isValidPassword = await PasswordUtil.verify(body.currentPassword, voter.passwordHash);
                 if (!isValidPassword) {
-                    throw new Error('Current password is incorrect');
+                    throw new Error("Current password is incorrect");
                 }
 
                 updates.passwordHash = await PasswordUtil.hash(body.newPassword);
@@ -408,21 +408,21 @@ export class VoterController {
             // Only update if there are changes
             if (Object.keys(updates).length > 0) {
                 const updatedVoter = this.voterService.updateVoter(voterID, updates);
-                
+
                 // Update session name if changed
                 if (updates.name) {
                     request.session.voterName = updatedVoter.name;
                 }
 
-                request.session.set('profileSuccess', 'Profile updated successfully');
+                request.session.set("profileSuccess", "Profile updated successfully");
             } else {
-                request.session.set('profileSuccess', 'No changes to save');
+                request.session.set("profileSuccess", "No changes to save");
             }
 
-            return reply.redirect('/profile');
+            return reply.redirect("/profile");
         } catch (error: any) {
-            request.session.set('profileError', error.message);
-            return reply.redirect('/profile');
+            request.session.set("profileError", error.message);
+            return reply.redirect("/profile");
         }
     }
 
@@ -432,12 +432,12 @@ export class VoterController {
     async deleteAccount(request: FastifyRequest, reply: FastifyReply): Promise<void> {
         // Admins cannot access voter pages
         if (request.session.isAdmin) {
-            return reply.redirect('/admin/dashboard');
+            return reply.redirect("/admin/dashboard");
         }
 
         const voterID = request.session.voterID;
         if (!voterID) {
-            return reply.redirect('/login');
+            return reply.redirect("/login");
         }
 
         const body = request.body as any;
@@ -445,17 +445,17 @@ export class VoterController {
         try {
             const voter = this.voterService.getVoterById(voterID);
             if (!voter) {
-                throw new Error('Voter not found');
+                throw new Error("Voter not found");
             }
 
             // Verify password before deletion
             if (!body.password) {
-                throw new Error('Password is required to delete your account');
+                throw new Error("Password is required to delete your account");
             }
 
             const isValidPassword = await PasswordUtil.verify(body.password, voter.passwordHash);
             if (!isValidPassword) {
-                throw new Error('Password is incorrect');
+                throw new Error("Password is incorrect");
             }
 
             // Delete the account
@@ -464,13 +464,13 @@ export class VoterController {
             // Destroy session and redirect
             request.session.destroy((err: any) => {
                 if (err) {
-                    console.error('Session destruction error:', err);
+                    console.error("Session destruction error:", err);
                 }
-                reply.redirect('/?deleted=1');
+                reply.redirect("/?deleted=1");
             });
         } catch (error: any) {
-            request.session.set('profileError', error.message);
-            return reply.redirect('/profile');
+            request.session.set("profileError", error.message);
+            return reply.redirect("/profile");
         }
     }
 }

@@ -1,5 +1,5 @@
-import { Election } from '../../domain/entities/Election';
-import { ElectionStatus } from '../../domain/enums';
+import { Election } from "../../domain/entities/Election";
+import { ElectionStatus } from "../../domain/enums";
 
 export interface IElectionRepository {
     save(election: Election): void;

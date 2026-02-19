@@ -1,8 +1,8 @@
-import Database from 'better-sqlite3';
-import { Voter } from '../domain/entities/Voter';
-import { RegistrationStatus } from '../domain/enums';
-import { IVoterRepository } from './interfaces/IVoterRepository';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { Voter } from "../domain/entities/Voter";
+import { RegistrationStatus } from "../domain/enums";
+import { IVoterRepository } from "./interfaces/IVoterRepository";
+import { DatabaseConnection } from "../db/connection";
 
 export class VoterRepository implements IVoterRepository {
     private db: Database.Database;
@@ -52,13 +52,7 @@ export class VoterRepository implements IVoterRepository {
             WHERE voter_id = ?
         `);
 
-        stmt.run(
-            voter.name,
-            voter.email,
-            voter.passwordHash,
-            voter.registrationStatus,
-            voter.voterID
-        );
+        stmt.run(voter.name, voter.email, voter.passwordHash, voter.registrationStatus, voter.voterID);
     }
 
     delete(voterID: string): void {
@@ -75,7 +69,7 @@ export class VoterRepository implements IVoterRepository {
         `);
 
         const rows = stmt.all() as any[];
-        return rows.map(row => this.mapRowToVoter(row));
+        return rows.map((row) => this.mapRowToVoter(row));
     }
 
     private mapRowToVoter(row: any): Voter {

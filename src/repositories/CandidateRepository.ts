@@ -1,7 +1,7 @@
-import Database from 'better-sqlite3';
-import { Candidate } from '../domain/entities/Candidate';
-import { ICandidateRepository } from './interfaces/ICandidateRepository';
-import { DatabaseConnection } from '../db/connection';
+import Database from "better-sqlite3";
+import { Candidate } from "../domain/entities/Candidate";
+import { ICandidateRepository } from "./interfaces/ICandidateRepository";
+import { DatabaseConnection } from "../db/connection";
 
 export class CandidateRepository implements ICandidateRepository {
     private db: Database.Database;
@@ -16,13 +16,7 @@ export class CandidateRepository implements ICandidateRepository {
             VALUES (?, ?, ?, ?, ?)
         `);
 
-        stmt.run(
-            candidate.candidateID,
-            candidate.electionID,
-            candidate.name,
-            candidate.party,
-            candidate.biography
-        );
+        stmt.run(candidate.candidateID, candidate.electionID, candidate.name, candidate.party, candidate.biography);
     }
 
     findById(candidateID: string): Candidate | null {
@@ -40,7 +34,7 @@ export class CandidateRepository implements ICandidateRepository {
         `);
 
         const rows = stmt.all(electionID) as any[];
-        return rows.map(row => this.mapRowToCandidate(row));
+        return rows.map((row) => this.mapRowToCandidate(row));
     }
 
     update(candidate: Candidate): void {
@@ -50,12 +44,7 @@ export class CandidateRepository implements ICandidateRepository {
             WHERE candidate_id = ?
         `);
 
-        stmt.run(
-            candidate.name,
-            candidate.party,
-            candidate.biography,
-            candidate.candidateID
-        );
+        stmt.run(candidate.name, candidate.party, candidate.biography, candidate.candidateID);
     }
 
     delete(candidateID: string): void {
@@ -72,16 +61,10 @@ export class CandidateRepository implements ICandidateRepository {
         `);
 
         const rows = stmt.all() as any[];
-        return rows.map(row => this.mapRowToCandidate(row));
+        return rows.map((row) => this.mapRowToCandidate(row));
     }
 
     private mapRowToCandidate(row: any): Candidate {
-        return new Candidate(
-            row.candidate_id,
-            row.election_id,
-            row.name,
-            row.party,
-            row.biography
-        );
+        return new Candidate(row.candidate_id, row.election_id, row.name, row.party, row.biography);
     }
 }
