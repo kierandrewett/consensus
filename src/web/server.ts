@@ -21,6 +21,7 @@ import {
     AdminRepository,
 } from "../repositories";
 import { TieResolutionRepository } from "../repositories/TieResolutionRepository";
+import { AuditLogRepository } from "../repositories/AuditLogRepository";
 import { SettingsRepository } from "../repositories/SettingsRepository";
 
 // Services
@@ -28,6 +29,11 @@ import { VoterService } from "../services/VoterService";
 import { ElectionService } from "../services/ElectionService";
 import { VotingService } from "../services/VotingService";
 import { ElectionScheduler } from "../services/ElectionScheduler";
+
+// Observer Pattern - Election event observers
+import { ElectionEventEmitter } from "../services/observers/ElectionEventEmitter";
+import { ElectionAuditLogger } from "../services/observers/ElectionAuditLogger";
+import { ElectionNotifier } from "../services/observers/ElectionNotifier";
 
 // Controllers
 import { VoterController } from "../controllers/VoterController";
@@ -140,6 +146,7 @@ export async function createServer(): Promise<FastifyInstance> {
     const confirmationRepository = new VoteConfirmationRepository();
     const adminRepository = new AdminRepository();
     const tieResolutionRepository = new TieResolutionRepository();
+    const auditLogRepository = new AuditLogRepository();
     // settingsRepository created above
 
     // Ensure at least one admin exists
@@ -161,7 +168,15 @@ export async function createServer(): Promise<FastifyInstance> {
 
     // Dependency Injection: Create service instances
     const voterService = new VoterService(voterRepository);
-    const electionService = new ElectionService(electionRepository, candidateRepository);
+
+    // Observer Pattern: Create event emitter and register concrete observers
+    const electionEventEmitter = new ElectionEventEmitter();
+    const auditLogger = new ElectionAuditLogger(auditLogRepository);
+    const electionNotifier = new ElectionNotifier();
+    electionEventEmitter.subscribe(auditLogger);
+    electionEventEmitter.subscribe(electionNotifier);
+
+    const electionService = new ElectionService(electionRepository, candidateRepository, electionEventEmitter);
     const votingService = new VotingService(
         ballotRepository,
         eligibilityRepository,

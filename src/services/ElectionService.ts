@@ -4,6 +4,7 @@ import { Candidate } from "../domain/entities/Candidate";
 import { ElectionType, ElectionStatus } from "../domain/enums";
 import { IElectionRepository } from "../repositories/interfaces/IElectionRepository";
 import { ICandidateRepository } from "../repositories/interfaces/ICandidateRepository";
+import { ElectionEventEmitter } from "./observers/ElectionEventEmitter";
 
 export interface ElectionCreationDTO {
     name: string;
@@ -20,10 +21,25 @@ export interface CandidateCreationDTO {
 }
 
 export class ElectionService {
+    /** Observer pattern: event emitter for election state changes */
+    private eventEmitter: ElectionEventEmitter;
+
     constructor(
         private electionRepository: IElectionRepository,
-        private candidateRepository: ICandidateRepository
-    ) {}
+        private candidateRepository: ICandidateRepository,
+        eventEmitter?: ElectionEventEmitter
+    ) {
+        this.eventEmitter = eventEmitter || new ElectionEventEmitter();
+    }
+
+    /**
+     * Get the event emitter to allow external code to subscribe observers.
+     * This keeps the Observer pattern's subscription mechanism accessible
+     * without exposing the full emitter internals.
+     */
+    getEventEmitter(): ElectionEventEmitter {
+        return this.eventEmitter;
+    }
 
     /**
      * Create a new election
@@ -154,8 +170,12 @@ export class ElectionService {
             throw new Error("Election must have at least 2 candidates");
         }
 
+        const previousStatus = election.status;
         election.status = ElectionStatus.ACTIVE;
         this.electionRepository.update(election);
+
+        // Observer pattern: notify all subscribers of the state change
+        this.eventEmitter.notify(election, previousStatus, ElectionStatus.ACTIVE);
     }
 
     /**
@@ -167,8 +187,12 @@ export class ElectionService {
             throw new Error("Election not found");
         }
 
+        const previousStatus = election.status;
         election.status = ElectionStatus.CLOSED;
         this.electionRepository.update(election);
+
+        // Observer pattern: notify all subscribers of the state change
+        this.eventEmitter.notify(election, previousStatus, ElectionStatus.CLOSED);
     }
 
     /**
