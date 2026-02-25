@@ -1,6 +1,7 @@
 # Consensus Voting System
 
 [![Tests](https://github.com/kierandrewett/shu-software-arch/actions/workflows/test.yml/badge.svg)](https://github.com/kierandrewett/shu-software-arch/actions/workflows/test.yml)
+[![Database](https://github.com/kierandrewett/shu-software-arch/actions/workflows/database.yml/badge.svg)](https://github.com/kierandrewett/shu-software-arch/actions/workflows/database.yml)
 
 A web-based e-voting platform built with Node.js and Fastify. Supports multiple voting methods including First Past The Post, Single Transferable Vote, and Alternative Vote.
 
