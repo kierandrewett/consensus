@@ -68,12 +68,12 @@ yarn test:e2e
 ## Project Structure
 
 - `src/` - Source code
-  - `controllers/` - Request handlers
-  - `services/` - Business logic
-  - `repositories/` - Data access layer
-  - `domain/` - Domain entities and enums
-  - `db/` - Database connection and migrations
-  - `web/` - Server setup, routes, and views
+    - `controllers/` - Request handlers
+    - `services/` - Business logic
+    - `repositories/` - Data access layer
+    - `domain/` - Domain entities and enums
+    - `db/` - Database connection and migrations
+    - `web/` - Server setup, routes, and views
 - `dist/` - Compiled output
 
 ## License
