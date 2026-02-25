@@ -55,6 +55,7 @@ jobs:
 
             - name: Start server
               run: |
+                  yarn build
                   yarn start &
                   SERVER_PID=$!
 

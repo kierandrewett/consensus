@@ -8,7 +8,7 @@
         "typecheck": "tsc --noEmit",
         "build": "rm -rf dist && node build.js",
         "dev": "NODE_ENV=development nodemon --watch src -e ts --exec 'yarn build && node dist/index.js'",
-        "start": "NODE_ENV=production node dist/bundle.js",
+        "start": "NODE_ENV=production node dist/index.js",
         "db:seed": "tsc && yarn build && node dist/seed.js",
         "db:reset": "yarn db:seed --reset",
         "test": "yarn test:unit && yarn test:e2e",
