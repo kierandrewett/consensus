@@ -1,53 +1,53 @@
 name: Tests
 
 on:
-  push:
-    branches: ["*"]
-    paths:
-      - "src/**"
-      - "build.js"
-      - "jest.*.cjs"
-  pull_request:
-    branches: ["*"]
-    paths:
-      - "src/**"
-      - "build.js"
-      - "jest.*.cjs"
+    push:
+        branches: ["*"]
+        paths:
+            - "src/**"
+            - "build.js"
+            - "jest.*.cjs"
+    pull_request:
+        branches: ["*"]
+        paths:
+            - "src/**"
+            - "build.js"
+            - "jest.*.cjs"
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [22]
+        strategy:
+            matrix:
+                node-version: [22]
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
+            - name: Enable Corepack
+              run: corepack enable
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: yarn
+            - name: Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: yarn
 
-      - name: Install dependencies
-        run: yarn install --immutable
+            - name: Install dependencies
+              run: yarn install --immutable
 
-      - name: Run typecheck
-        run: yarn typecheck
+            - name: Run typecheck
+              run: yarn typecheck
 
-      - name: Run unit tests
-        run: yarn test:unit
+            - name: Run unit tests
+              run: yarn test:unit
 
-      - name: Build application
-        run: yarn build
+            - name: Build application
+              run: yarn build
 
-      - name: Run e2e tests
-        run: yarn test:e2e
-        env:
-          CI: true
+            - name: Run e2e tests
+              run: yarn test:e2e
+              env:
+                  CI: true

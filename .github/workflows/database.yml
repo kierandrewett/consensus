@@ -1,74 +1,73 @@
 name: Database
 
 on:
-  push:
-    branches: ["*"]
-    paths:
-      - "src/db/**"
-      - "src/seed.ts"
-      - "src/domain/**"
-      - "src/repositories/**"
-  pull_request:
-    branches: ["*"]
-    paths:
-      - "src/db/**"
-      - "src/seed.ts"
-      - "src/domain/**"
-      - "src/repositories/**"
+    push:
+        branches: ["*"]
+        paths:
+            - "src/db/**"
+            - "src/seed.ts"
+            - "src/domain/**"
+            - "src/repositories/**"
+    pull_request:
+        branches: ["*"]
+        paths:
+            - "src/db/**"
+            - "src/seed.ts"
+            - "src/domain/**"
+            - "src/repositories/**"
+        workflow_dispatch:
 
 jobs:
-  database:
-    runs-on: ubuntu-latest
+    database:
+        runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [22]
+        strategy:
+            matrix:
+                node-version: [22]
 
-    env:
-      DATA_DIR: /tmp/consensus-test
+        env:
+            DATA_DIR: /tmp/consensus-test
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
+            - name: Enable Corepack
+              run: corepack enable
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: yarn
+            - name: Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: yarn
 
-      - name: Install dependencies
-        run: yarn install --immutable
+            - name: Install dependencies
+              run: yarn install --immutable
 
-      - name: Build application
-        run: yarn build
+            - name: Build application
+              run: yarn build
 
-      - name: Reset database
-        run: yarn db:reset
+            - name: Reset database
+              run: yarn db:reset
 
-      - name: Seed database
-        run: yarn db:seed
+            - name: Seed database
+              run: yarn db:seed
 
-      - name: Start server
-        run: |
-          yarn start &
-          SERVER_PID=$!
+            - name: Start server
+              run: |
+                  yarn start &
+                  SERVER_PID=$!
 
-          for i in $(seq 1 10); do
-            if curl -s -o /dev/null -w '%{http_code}' http://localhost:3000 | grep -q '200\|302'; then
-              echo "Server responded after ${i}s"
-              kill $SERVER_PID
-              exit 0
-            fi
-            sleep 1
-          done
+                  for i in $(seq 1 10); do
+                    if curl -s -o /dev/null -w '%{http_code}' http://localhost:3000 | grep -q '200\|302'; then
+                      echo "Server responded after ${i}s"
+                      kill $SERVER_PID
+                      exit 0
+                    fi
+                    sleep 1
+                  done
 
-          echo "Server did not respond within 10s"
-          kill $SERVER_PID 2>/dev/null
-          exit 1
-        timeout-minutes: 1
-
-     
+                  echo "Server did not respond within 10s"
+                  kill $SERVER_PID 2>/dev/null
+                  exit 1
+              timeout-minutes: 1
