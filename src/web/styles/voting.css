@@ -76,7 +76,7 @@
 }
 
 .voter-value.voter-id {
-    font-family: 'SF Mono', 'Consolas', monospace;
+    font-family: "SF Mono", "Consolas", monospace;
     font-size: 0.6875rem;
     font-weight: 400;
     color: var(--muted);
@@ -318,7 +318,7 @@
 }
 
 .review-voter-id {
-    font-family: 'SF Mono', 'Consolas', monospace;
+    font-family: "SF Mono", "Consolas", monospace;
     font-size: 0.75rem;
     color: var(--muted);
     margin: 0.25rem 0 0;
@@ -430,22 +430,20 @@
     .vote-page {
         padding: 1rem;
     }
-    
+
     .vote-layout {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .vote-sidebar {
         position: static;
     }
-    
+
     .review-panel {
         max-width: none;
     }
 }
-
-
 
 /* FPTP Ballot - X in Box */
 .candidates-fptp {
@@ -547,7 +545,7 @@
     line-height: 1.5;
 }
 
-/* Candidate Options - FPTP (legacy) */
+/* Candidate Options (legacy) */
 .candidates-radio {
     display: flex;
     flex-direction: column;
@@ -600,7 +598,7 @@
 }
 
 .candidate-option input[type="radio"]:checked::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
@@ -648,7 +646,7 @@
     flex-shrink: 0;
 }
 
-/* Legacy styles kept for compatibility */
+/* Legacy styles */
 
 /* Election Details */
 .election-details {
@@ -847,7 +845,7 @@
     padding: 1rem 0;
 }
 
-/* Turnstile Verification Slide */
+/* Turnstile Verification */
 .turnstile-panel {
     background: white;
     border: 1px solid var(--border);

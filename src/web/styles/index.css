@@ -1,29 +1,27 @@
-/* Main stylesheet entry point - imports all styles in correct order */
-
 /* Base styles and variables */
-@import url('base.css');
+@import url("base.css");
 
-/* Core components */
-@import url('buttons.css');
-@import url('forms.css');
-@import url('badges.css');
-@import url('icons.css');
-@import url('alerts.css');
-@import url('modal.css');
-@import url('tables.css');
-@import url('cards.css');
+/* Components */
+@import url("buttons.css");
+@import url("forms.css");
+@import url("badges.css");
+@import url("icons.css");
+@import url("alerts.css");
+@import url("modal.css");
+@import url("tables.css");
+@import url("cards.css");
 
 /* Layout */
-@import url('navigation.css');
-@import url('footer.css');
+@import url("navigation.css");
+@import url("footer.css");
 
-/* Page-specific styles */
-@import url('landing.css');
-@import url('hero.css');
-@import url('auth.css');
-@import url('dashboard.css');
-@import url('admin.css');
-@import url('voting.css');
-@import url('confirmation.css');
-@import url('receipt.css');
-@import url('kiosk.css');
+/* Pages */
+@import url("landing.css");
+@import url("hero.css");
+@import url("auth.css");
+@import url("dashboard.css");
+@import url("admin.css");
+@import url("voting.css");
+@import url("confirmation.css");
+@import url("receipt.css");
+@import url("kiosk.css");

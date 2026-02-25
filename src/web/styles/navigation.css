@@ -1,12 +1,6 @@
-/* Test mode banner - danger stripes */
+/* Test mode banner */
 .test-mode-banner {
-    background: repeating-linear-gradient(
-        45deg,
-        #000000,
-        #000000 10px,
-        #ffd700 10px,
-        #ffd700 20px
-    );
+    background: repeating-linear-gradient(45deg, #000000, #000000 10px, #ffd700 10px, #ffd700 20px);
     padding: 0.5rem 0;
     text-align: center;
     position: relative;
@@ -89,8 +83,12 @@
     color: var(--brand);
     text-decoration: none;
 }
-.brand:hover { opacity: 0.9; }
-.brand i { color: var(--brand); }
+.brand:hover {
+    opacity: 0.9;
+}
+.brand i {
+    color: var(--brand);
+}
 
 .nav-links {
     display: flex;

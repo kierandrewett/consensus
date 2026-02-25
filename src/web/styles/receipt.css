@@ -1,7 +1,10 @@
-/* Receipt Print Page Styles */
+/* Receipt print page */
 
 .receipt-page {
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        sans-serif;
     padding: 40px;
     max-width: 600px;
     margin: 0 auto;
@@ -89,7 +92,7 @@
 }
 
 .receipt-page .value.mono {
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
     font-size: 14px;
 }
 

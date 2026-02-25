@@ -34,14 +34,18 @@
     box-shadow: var(--focus-ring);
 }
 
-.form-container .btn { width: 100%; }
+.form-container .btn {
+    width: 100%;
+}
 
 .form-group small {
     font-size: 0.875rem;
     color: var(--muted);
 }
 
-.settings-form .form-group { margin-bottom: 1.5rem; }
+.settings-form .form-group {
+    margin-bottom: 1.5rem;
+}
 
 .settings-form label {
     display: block;
@@ -50,7 +54,9 @@
     color: var(--text);
 }
 
-.settings-form input[type="checkbox"] { margin-right: 0.5rem; }
+.settings-form input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
 
 /* Date helper buttons */
 .date-helper-btn {

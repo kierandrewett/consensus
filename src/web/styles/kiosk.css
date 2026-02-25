@@ -62,7 +62,9 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
 }
 
 .kiosk-form-group input:focus,
@@ -279,7 +281,9 @@
     padding: 1rem;
     border-radius: 6px;
     text-decoration: none;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition:
+        background-color 0.15s,
+        border-color 0.15s;
     border: 1px solid transparent;
 }
 
@@ -455,7 +459,9 @@
     border-radius: 8px;
     border: 1px solid var(--border);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
 }
 
 .kiosk-election-card:hover {

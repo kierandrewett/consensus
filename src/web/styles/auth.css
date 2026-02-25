@@ -1,4 +1,4 @@
-/* Auth pages (Login/Register) - Standalone full-page layout */
+/* Auth pages */
 .auth-page {
     margin: 0;
     padding: 0;
@@ -162,20 +162,20 @@
     .auth-layout {
         flex-direction: column;
     }
-    
+
     .auth-brand {
         flex: 0 0 auto;
         padding: 2rem 1.5rem;
     }
-    
+
     .auth-brand-content h2 {
         font-size: 1.5rem;
     }
-    
+
     .auth-brand-content p {
         font-size: 1rem;
     }
-    
+
     .auth-panel {
         padding: 2rem 1.5rem;
     }

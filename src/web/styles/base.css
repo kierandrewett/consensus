@@ -16,7 +16,7 @@
     --bg: #f8fafc;
     --border: #e2e8f0;
 
-    /* Shadows - reused enough to warrant a variable */
+    /* Shadows */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -33,7 +33,10 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        sans-serif;
     line-height: 1.6;
     color: var(--text);
     background: var(--bg);
@@ -59,4 +62,3 @@ abbr {
 abbr:hover {
     text-decoration: underline solid;
 }
-

@@ -84,15 +84,15 @@
     .landing-hero h1 {
         font-size: 2rem;
     }
-    
+
     .landing-subtitle {
         font-size: 1rem;
     }
-    
+
     .landing-cta {
         flex-direction: column;
     }
-    
+
     .landing-features {
         grid-template-columns: 1fr;
         gap: 1.5rem;

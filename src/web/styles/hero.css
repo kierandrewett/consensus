@@ -14,8 +14,7 @@
     color: var(--muted);
 }
 
-
-/* Home hero - landing page */
+/* Home hero */
 
 .home-hero {
     display: flex;
@@ -68,7 +67,9 @@
     font-size: 1rem;
     font-weight: 500;
     text-decoration: none;
-    transition: background-color 0.15s, border-color 0.15s;
+    transition:
+        background-color 0.15s,
+        border-color 0.15s;
 }
 
 .hero-btn.primary {
@@ -109,17 +110,25 @@
     font-weight: 500;
     color: var(--muted);
 }
-.feature-item i { color: var(--success); }
+.feature-item i {
+    color: var(--success);
+}
 
 @media (max-width: 768px) {
-    .hero-title { font-size: 2.5rem; }
-    .hero-subtitle { font-size: 1.25rem; }
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    .hero-subtitle {
+        font-size: 1.25rem;
+    }
 
     .hero-actions {
         flex-direction: column;
         align-items: stretch;
     }
-    .hero-btn { justify-content: center; }
+    .hero-btn {
+        justify-content: center;
+    }
 
     .hero-features {
         flex-direction: column;
@@ -127,7 +136,7 @@
     }
 }
 
-/* Legacy home selector - might remove later */
+/* Legacy home selector */
 
 .home-selector {
     display: flex;
@@ -164,8 +173,12 @@
 }
 
 @media (max-width: 768px) {
-    .role-selection { grid-template-columns: 1fr; }
-    .selector-title { font-size: 2rem; }
+    .role-selection {
+        grid-template-columns: 1fr;
+    }
+    .selector-title {
+        font-size: 2rem;
+    }
 }
 
 .role-card {
@@ -183,20 +196,21 @@
 }
 
 .role-card::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
-.role-card:hover::before { opacity: 1; }
+.role-card:hover::before {
+    opacity: 1;
+}
 
 .role-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-lg);
 }
-
 
 /* Voter card */
 
@@ -208,7 +222,9 @@
 .voter-card::before {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
 }
-.voter-card:hover { border-color: #4c51bf; }
+.voter-card:hover {
+    border-color: #4c51bf;
+}
 
 .voter-card .role-icon {
     margin-bottom: 1.5rem;
@@ -229,7 +245,6 @@
     color: rgba(255, 255, 255, 0.9);
 }
 
-
 /* Admin card */
 
 .admin-card {
@@ -241,7 +256,9 @@
 .admin-card::before {
     background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
 }
-.admin-card:hover { border-color: #0284c7; }
+.admin-card:hover {
+    border-color: #0284c7;
+}
 
 .admin-card .role-icon {
     margin-bottom: 1.5rem;

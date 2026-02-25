@@ -1,4 +1,4 @@
-/* Voter Dashboard Layout */
+/* Voter Dashboard */
 body:has(.dashboard-header-bar) {
     display: flex;
     flex-direction: column;
@@ -74,7 +74,9 @@ body:has(.dashboard-header-bar) .dashboard-main {
     font-weight: 500;
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
-    transition: color 0.15s, border-color 0.15s;
+    transition:
+        color 0.15s,
+        border-color 0.15s;
 }
 
 .dashboard-tab:hover {
@@ -286,13 +288,13 @@ body:has(.dashboard-header-bar) .dashboard-main {
     .quick-stats {
         flex-direction: column;
     }
-    
+
     .dashboard-tabs {
         overflow-x: auto;
     }
 }
 
-/* Stats Row - Voter Dashboard */
+/* Stats Row */
 .stats-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -600,7 +602,7 @@ body:has(.dashboard-header-bar) .dashboard-main {
 }
 
 .voter-info-item code.info-value {
-    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
     font-size: 0.875rem;
     background: white;
     padding: 0.25rem 0.5rem;
@@ -613,11 +615,11 @@ body:has(.dashboard-header-bar) .dashboard-main {
     .stats-row {
         grid-template-columns: 1fr;
     }
-    
+
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .voter-info-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -860,8 +862,13 @@ body:has(.dashboard-header-bar) .dashboard-main {
 }
 
 @keyframes pulse-text {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
 }
 
 .election-card .btn-block {
@@ -1057,7 +1064,7 @@ body:has(.dashboard-header-bar) .dashboard-main {
     padding-top: 1.5rem !important;
 }
 
-/* Page header for non-logged-in users */
+/* Page header (non-logged-in) */
 .page-header {
     margin-bottom: 1.5rem;
 }
@@ -1073,7 +1080,7 @@ body:has(.dashboard-header-bar) .dashboard-main {
     font-size: 0.9375rem;
 }
 
-/* Elections container for non-dashboard view */
+/* Elections container (non-dashboard) */
 .elections-container {
     max-width: 900px;
     margin: 0 auto;
