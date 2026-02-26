@@ -1,6 +1,6 @@
 {
     "name": "Consensus Voting System",
-    "image": "mcr.microsoft.com/devcontainers/typescript-node:1-24-bookworm",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
     "postCreateCommand": "corepack enable && yarn install",
     "remoteUser": "root",
     "forwardPorts": [3000],
