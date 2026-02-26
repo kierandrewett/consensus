@@ -1,6 +1,14 @@
 {
-  "image": "ghcr.io/devcontainers/features/node:1",
-  "features": {
-    "version": "22"
-  }
+    "name": "Consensus Voting System",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+    "postCreateCommand": "corepack enable && yarn install",
+    "forwardPorts": [3000],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode"
+            ]
+        }
+    }
 }
