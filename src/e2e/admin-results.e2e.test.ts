@@ -33,12 +33,12 @@ describe("E2E: Admin Results", () => {
         });
 
         it("should navigate to election results from list", async () => {
-            await ctx.page.goto(`${ctx.baseUrl}/admin/results`, { waitUntil: "networkidle0" });
+            await ctx.page.goto(`${ctx.baseUrl}/admin/results`, { waitUntil: "networkidle2" });
 
             const resultLink = await ctx.page.$('a[href*="/admin/elections/"]');
             if (resultLink) {
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0", timeout: 15000 }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2", timeout: 15000 }),
                     resultLink.click(),
                 ]);
 

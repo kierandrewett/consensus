@@ -100,7 +100,7 @@ describe("E2E: Admin Management Settings", () => {
 
                 // Submit form
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('button[type="submit"]'),
                 ]);
 
@@ -126,7 +126,7 @@ describe("E2E: Admin Management Settings", () => {
 
                 // Submit form
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('button[type="submit"]'),
                 ]);
 
@@ -140,7 +140,7 @@ describe("E2E: Admin Management Settings", () => {
                 // Reset to original state
                 await ctx.page.click('input[name="maintenanceMode"]');
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('button[type="submit"]'),
                 ]);
             }
@@ -160,7 +160,7 @@ describe("E2E: Admin Management Settings", () => {
                 await ctx.page.click('input[name="autoApprovalEnabled"]');
 
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('button[type="submit"]'),
                 ]);
 
@@ -173,7 +173,7 @@ describe("E2E: Admin Management Settings", () => {
                 // Reset
                 await ctx.page.click('input[name="autoApprovalEnabled"]');
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('button[type="submit"]'),
                 ]);
             }

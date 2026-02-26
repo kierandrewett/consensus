@@ -18,7 +18,7 @@ describe("E2E: Admin Elections Management", () => {
 
     describe("Elections List", () => {
         it("should navigate to elections page", async () => {
-            await ctx.page.goto(`${ctx.baseUrl}/admin/elections`, { waitUntil: "networkidle0" });
+            await ctx.page.goto(`${ctx.baseUrl}/admin/elections`, { waitUntil: "networkidle2" });
 
             const heading = await ctx.page.$eval("h1", (el) => el.textContent);
             expect(heading).toContain("Election");
@@ -52,7 +52,7 @@ describe("E2E: Admin Elections Management", () => {
             await ctx.page.type("#description", "E2E test election description");
 
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                 ctx.page.click('#createElectionForm button[type="submit"]'),
             ]);
 
@@ -87,7 +87,7 @@ describe("E2E: Admin Elections Management", () => {
                 await ctx.page.type("#electionName", `Details Test Election ${Date.now()}`);
                 await ctx.page.select("#electionType", "FPTP");
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('#createElectionForm button[type="submit"]'),
                 ]);
 
@@ -97,7 +97,7 @@ describe("E2E: Admin Elections Management", () => {
                 const pageContent = await ctx.page.content();
                 expect(pageContent.toLowerCase()).toMatch(/election|status|candidates/);
             } else {
-                await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle0" }), electionLink.click()]);
+                await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle2" }), electionLink.click()]);
 
                 const pageContent = await ctx.page.content();
                 expect(pageContent.toLowerCase()).toMatch(/election|status|candidates/);
@@ -118,7 +118,7 @@ describe("E2E: Admin Elections Management", () => {
             await ctx.page.type("#description", "Test election for candidates");
 
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0", timeout: 15000 }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2", timeout: 15000 }),
                 ctx.page.click('#createElectionForm button[type="submit"]'),
             ]);
 

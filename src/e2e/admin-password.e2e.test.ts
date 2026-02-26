@@ -66,7 +66,7 @@ describe("E2E: Admin Password Change", () => {
             await ctx.page.type('input[name="confirmPassword"]', "DifferentPassword456!");
 
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }).catch(() => {}),
                 ctx.page.click('button[type="submit"]'),
             ]);
 

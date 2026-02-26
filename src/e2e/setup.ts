@@ -98,7 +98,7 @@ export async function loginAsAdmin(ctx: E2EContext): Promise<void> {
     await clearCookies(ctx.page);
 
     // Navigate to login page and wait for it to fully load
-    await ctx.page.goto(`${ctx.baseUrl}/admin/login`, { timeout: 15000, waitUntil: "networkidle0" });
+    await ctx.page.goto(`${ctx.baseUrl}/admin/login`, { timeout: 15000, waitUntil: "networkidle2" });
 
     // If already redirected to dashboard, we're logged in
     if (ctx.page.url().includes("/admin/dashboard")) {
@@ -111,7 +111,7 @@ export async function loginAsAdmin(ctx: E2EContext): Promise<void> {
     await ctx.page.type('input[name="username"]', "admin");
     await ctx.page.type('input[name="password"]', adminPassword);
     await Promise.all([
-        ctx.page.waitForNavigation({ waitUntil: "networkidle0", timeout: 15000 }),
+        ctx.page.waitForNavigation({ waitUntil: "networkidle2", timeout: 15000 }),
         ctx.page.click('button[type="submit"]'),
     ]);
 
@@ -121,7 +121,7 @@ export async function loginAsAdmin(ctx: E2EContext): Promise<void> {
         await ctx.page.type('input[name="password"]', CHANGED_ADMIN_PASSWORD);
         await ctx.page.type('input[name="confirmPassword"]', CHANGED_ADMIN_PASSWORD);
         await Promise.all([
-            ctx.page.waitForNavigation({ waitUntil: "networkidle0", timeout: 15000 }),
+            ctx.page.waitForNavigation({ waitUntil: "networkidle2", timeout: 15000 }),
             ctx.page.click('button[type="submit"]'),
         ]);
         // Update the password for subsequent logins
@@ -145,7 +145,7 @@ export async function loginAsVoter(
     await ctx.page.type('input[name="email"]', email);
     await ctx.page.type('input[name="password"]', password);
     await Promise.all([
-        ctx.page.waitForNavigation({ waitUntil: "networkidle0", timeout: 10000 }),
+        ctx.page.waitForNavigation({ waitUntil: "networkidle2", timeout: 10000 }),
         ctx.page.click('button[type="submit"]'),
     ]);
 }

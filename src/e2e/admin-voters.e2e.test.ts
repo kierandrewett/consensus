@@ -12,7 +12,7 @@ async function createTestVoter(ctx: E2EContext, namePrefix: string): Promise<str
     await ctx.page.type('input[name="email"]', uniqueEmail);
     await ctx.page.type('input[name="password"]', "SecurePassword123!");
     await Promise.all([
-        ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+        ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
         ctx.page.click('button[type="submit"]'),
     ]);
     return uniqueEmail;
@@ -78,7 +78,7 @@ describe("E2E: Admin Voters Management", () => {
             const voterLink = await ctx.page.$('a[href*="/admin/voters/"]');
             expect(voterLink).not.toBeNull(); // Should have at least one voter from setup
 
-            await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle0" }), voterLink!.click()]);
+            await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle2" }), voterLink!.click()]);
 
             const url = ctx.page.url();
             expect(url).toContain("/admin/voters/");
@@ -90,7 +90,7 @@ describe("E2E: Admin Voters Management", () => {
             const voterLink = await ctx.page.$('a[href*="/admin/voters/"]');
             expect(voterLink).not.toBeNull();
 
-            await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle0" }), voterLink!.click()]);
+            await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle2" }), voterLink!.click()]);
 
             const pageContent = await ctx.page.content();
             // Should show voter details like name, email, status
@@ -109,7 +109,7 @@ describe("E2E: Admin Voters Management", () => {
             await ctx.page.type('input[name="email"]', uniqueEmail);
             await ctx.page.type('input[name="password"]', "SecurePassword123!");
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                 ctx.page.click('button[type="submit"]'),
             ]);
 
@@ -132,13 +132,13 @@ describe("E2E: Admin Voters Management", () => {
             await ctx.page.type('input[name="email"]', uniqueEmail);
             await ctx.page.type('input[name="password"]', "SecurePassword123!");
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                 ctx.page.click('button[type="submit"]'),
             ]);
 
             // Login as admin (loginAsAdmin clears cookies internally)
             await loginAsAdmin(ctx);
-            await ctx.page.goto(`${ctx.baseUrl}/admin/voters`, { waitUntil: "networkidle0" });
+            await ctx.page.goto(`${ctx.baseUrl}/admin/voters`, { waitUntil: "networkidle2" });
 
             // Look for approve button or link
             const approveBtn = await ctx.page.$(
@@ -146,7 +146,7 @@ describe("E2E: Admin Voters Management", () => {
             );
             if (approveBtn) {
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }).catch(() => {}),
                     approveBtn.click(),
                 ]);
 
@@ -175,13 +175,13 @@ describe("E2E: Admin Voters Management", () => {
             await ctx.page.type('input[name="email"]', uniqueEmail);
             await ctx.page.type('input[name="password"]', "SecurePassword123!");
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                 ctx.page.click('button[type="submit"]'),
             ]);
 
             // Login as admin (loginAsAdmin clears cookies internally)
             await loginAsAdmin(ctx);
-            await ctx.page.goto(`${ctx.baseUrl}/admin/voters`, { waitUntil: "networkidle0" });
+            await ctx.page.goto(`${ctx.baseUrl}/admin/voters`, { waitUntil: "networkidle2" });
 
             // Look for reject button or link
             const rejectBtn = await ctx.page.$(
@@ -189,7 +189,7 @@ describe("E2E: Admin Voters Management", () => {
             );
             if (rejectBtn) {
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {}),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }).catch(() => {}),
                     rejectBtn.click(),
                 ]);
 

@@ -96,7 +96,7 @@ describe("E2E: Admin Authentication", () => {
             await ctx.page.type('input[name="email"]', uniqueEmail);
             await ctx.page.type('input[name="password"]', "SecurePassword123!");
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                 ctx.page.click('button[type="submit"]'),
             ]);
 

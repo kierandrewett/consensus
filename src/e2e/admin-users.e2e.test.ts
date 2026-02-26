@@ -72,7 +72,7 @@ describe("E2E: Admin Users Management", () => {
                 await ctx.page.type("#adminUsername", uniqueUsername);
 
                 await Promise.all([
-                    ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                    ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                     ctx.page.click('#createAdminForm button[type="submit"]'),
                 ]);
 

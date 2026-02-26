@@ -48,7 +48,7 @@ describe("E2E: Voting Flow", () => {
 
             const voteBtn = await ctx.page.$("a.kiosk-btn");
             if (voteBtn) {
-                await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle0" }), voteBtn.click()]);
+                await Promise.all([ctx.page.waitForNavigation({ waitUntil: "networkidle2" }), voteBtn.click()]);
 
                 const pageContent = await ctx.page.content();
                 expect(pageContent.toLowerCase()).toMatch(/vote|candidate|already/);

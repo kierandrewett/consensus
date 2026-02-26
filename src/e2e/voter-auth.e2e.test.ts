@@ -59,7 +59,7 @@ describe("E2E: Voter Authentication", () => {
             await ctx.page.type('input[name="password"]', "SecurePassword123!");
 
             await Promise.all([
-                ctx.page.waitForNavigation({ waitUntil: "networkidle0" }),
+                ctx.page.waitForNavigation({ waitUntil: "networkidle2" }),
                 ctx.page.click('button[type="submit"]'),
             ]);
 
@@ -76,7 +76,7 @@ describe("E2E: Voter Authentication", () => {
             await ctx.page.type('input[name="password"]', "SecurePassword123!");
 
             await ctx.page.click('button[type="submit"]');
-            await ctx.page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {});
+            await ctx.page.waitForNavigation({ waitUntil: "networkidle2" }).catch(() => {});
 
             const pageContent = await ctx.page.content();
             expect(pageContent.toLowerCase()).toMatch(/already|exists|duplicate|error/);
@@ -103,7 +103,7 @@ describe("E2E: Voter Authentication", () => {
             await ctx.page.type('input[name="password"]', "wrongpassword");
 
             await ctx.page.click('button[type="submit"]');
-            await ctx.page.waitForNavigation({ waitUntil: "networkidle0" }).catch(() => {});
+            await ctx.page.waitForNavigation({ waitUntil: "networkidle2" }).catch(() => {});
 
             const pageContent = await ctx.page.content();
             expect(pageContent.toLowerCase()).toMatch(/invalid|error|incorrect/);
