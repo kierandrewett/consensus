@@ -25,6 +25,16 @@ A web-based e-voting platform built with Node.js and Fastify. Supports multiple 
 - Node.js 22 or later: https://nodejs.org
 - Yarn: install with `npm i yarn -g`
 
+## Quick Start with GitHub Codespaces
+
+You can run this project in the browser without installing anything locally. On the GitHub repo page, click **Code** -> **Codespaces** -> **Create codespace on master**. The dev container will install Node.js and dependencies automatically, which can take a few minutes. Once it's finished, run:
+
+```bash
+yarn start
+```
+
+The app will start and Codespaces will prompt you to open it in the browser.
+
 ## Getting Started
 
 Install dependencies:
