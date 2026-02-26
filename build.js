@@ -44,6 +44,7 @@ const clientBuildOptions = {
         "./src/web/client/admin-results.ts",
         "./src/web/client/admin-voters.ts",
         "./src/web/client/admin-elections.ts",
+        "./src/web/client/mts.ts",
     ],
     bundle: true,
     minify: true,
