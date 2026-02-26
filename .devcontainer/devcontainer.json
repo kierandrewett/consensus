@@ -1,7 +1,7 @@
 {
     "name": "Consensus Voting System",
     "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-    "postCreateCommand": "yarn install && yarn build && yarn db:reset && yarn db:seed && yarn start",
+    "postCreateCommand": "yarn install && yarn build && yarn db:reset && yarn db:seed",
     "remoteUser": "root",
     "forwardPorts": [3000],
     "customizations": {
