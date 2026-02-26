@@ -18,7 +18,7 @@ describe("E2E: Admin Elections Management", () => {
 
     describe("Elections List", () => {
         it("should navigate to elections page", async () => {
-            await ctx.page.goto(`${ctx.baseUrl}/admin/elections`);
+            await ctx.page.goto(`${ctx.baseUrl}/admin/elections`, { waitUntil: "networkidle0" });
 
             const heading = await ctx.page.$eval("h1", (el) => el.textContent);
             expect(heading).toContain("Election");

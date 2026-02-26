@@ -100,6 +100,11 @@ export async function loginAsAdmin(ctx: E2EContext): Promise<void> {
     // Navigate to login page and wait for it to fully load
     await ctx.page.goto(`${ctx.baseUrl}/admin/login`, { timeout: 15000, waitUntil: "networkidle0" });
 
+    // If already redirected to dashboard, we're logged in
+    if (ctx.page.url().includes("/admin/dashboard")) {
+        return;
+    }
+
     // Wait for the form to be present
     await ctx.page.waitForSelector('input[name="username"]', { visible: true, timeout: 10000 });
 
