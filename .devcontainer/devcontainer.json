@@ -1,7 +1,7 @@
 {
     "name": "Consensus Voting System",
     "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-    "postCreateCommand": "corepack enable && yarn install",
+    "postCreateCommand": "CI=1 COREPACK_ENABLE_AUTO_PIN=0 corepack enable --install-directory /usr/local/bin && yarn install",
     "remoteUser": "root",
     "forwardPorts": [3000],
     "customizations": {
