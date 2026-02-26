@@ -35,6 +35,8 @@ yarn start
 
 The app will start and Codespaces will prompt you to open it in the browser.
 
+**Important**: When the server starts, example login credentials for voters and admins will be printed to the console. You will need these to login.
+
 ## Getting Started
 
 Install dependencies:
@@ -61,7 +63,9 @@ Start the server:
 yarn start
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be available at `http://localhost:3000`. 
+
+**Important**: When the server starts, as long as you have ran `yarn db:seed` first, example login credentials for voters and admins will be printed to the console. You will need these to login.
 
 ## Development
 
