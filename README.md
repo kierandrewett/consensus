@@ -22,7 +22,7 @@ A web-based e-voting platform built with Node.js and Fastify. Supports multiple 
 
 ## Requirements
 
-- Node.js 18 or later: https://nodejs.org
+- Node.js 22 or later: https://nodejs.org
 - Yarn: install with `npm i yarn -g`
 
 ## Getting Started
