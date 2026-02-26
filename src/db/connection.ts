@@ -29,7 +29,7 @@ export class DatabaseConnection {
 
     public static runMigrations(): void {
         if (!DatabaseConnection.instance) {
-            throw new Error("Database connection not initialized. Call getInstance() first.");
+            throw new Error("Database connection not initialised. Call getInstance() first.");
         }
 
         // Create migrations tracking table

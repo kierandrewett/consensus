@@ -5,6 +5,21 @@
 
 A web-based e-voting platform built with Node.js and Fastify. Supports multiple voting methods including First Past The Post, Single Transferable Vote, and Alternative Vote.
 
+## Deliverables
+
+- [Evaluation Report](deliverables/evaluation-report.pdf)
+- Wireframes:
+    - [Home](deliverables/wireframes/01-home.png)
+    - [Register](deliverables/wireframes/02-register.png)
+    - [Login](deliverables/wireframes/03-login.png)
+    - [Voter Dashboard](deliverables/wireframes/04-voter-dashboard.png)
+    - [Voting (FPTP)](deliverables/wireframes/05-voting-fptp.png)
+    - [Admin Dashboard](deliverables/wireframes/06-admin-dashboard.png)
+    - [Election Results](deliverables/wireframes/07-election-results.png)
+- Diagrams:
+    - [Class Diagram](deliverables/diagrams/class-diagram.png)
+    - [Architecture Diagram](deliverables/diagrams/architecture-diagram.png)
+
 ## Requirements
 
 - Node.js 18 or later: https://nodejs.org
